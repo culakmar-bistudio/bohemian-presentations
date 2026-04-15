@@ -1,4 +1,5 @@
 .claude/
 .opencode/
+.vercel/
 opencode.json
 claude-plan.md
