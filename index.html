@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bohemia Interactive — bohemia.net</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bi-green: #6ba539;
+      --bi-green-dark: #417714;
+      --text-primary: #222;
+      --text-secondary: #666;
+      --bg-light: #f0f0ee;
+      --bg-white: #fff;
+      --bg-dark: #0a0a0a;
+      --nav-height: 64px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; color: var(--text-primary); background: var(--bg-white); }
+
+    /* ── NAV ── */
+    #main-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-height);
+      background: var(--bg-light);
+      border-bottom: 1px solid #d8d8d4;
+      display: flex; align-items: center;
+      padding: 0 32px;
+      gap: 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    /* Hub-switcher area */
+    .nav-hub-switcher { position: relative; display: flex; align-items: center; gap: 8px; margin-right: 28px; }
+    .nav-hub-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: none; border: none; cursor: pointer;
+      font-family: 'Barlow', sans-serif;
+      color: var(--text-primary); padding: 4px 0;
+    }
+    .nav-hub-btn .bi-logo { width: 32px; height: 36px; flex-shrink: 0; }
+    .nav-hub-btn .bi-wordmark { display: flex; flex-direction: column; line-height: 1.1; }
+    .nav-hub-btn .bi-wordmark span:first-child { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; }
+    .nav-hub-btn .bi-wordmark span:last-child { font-size: 10px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.06em; }
+    .nav-hub-btn .chevron { font-size: 10px; color: var(--text-secondary); margin-left: 2px; transition: transform 0.2s; }
+    .nav-hub-btn[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+    /* Dropdown */
+    .hub-dropdown {
+      display: none; position: absolute; top: calc(100% + 12px); left: -16px;
+      background: #fff; border: 1px solid #e0e0dc;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      padding: 20px; width: 300px; z-index: 200;
+    }
+    .hub-dropdown.open { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+    .hub-dropdown-section { margin-bottom: 16px; }
+    .hub-dropdown-section h4 { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #999; text-transform: uppercase; margin-bottom: 8px; }
+    .hub-dropdown-section a {
+      display: flex; align-items: center; gap: 8px; padding: 5px 0;
+      font-size: 13px; font-weight: 500; color: var(--text-primary);
+      text-decoration: none; border-bottom: 1px solid transparent;
+      transition: color 0.15s;
+    }
+    .hub-dropdown-section a:hover { color: var(--bi-green); }
+    .hub-dropdown-section a .dot { width: 6px; height: 6px; border-radius: 50%; background: #d0d0cc; flex-shrink: 0; }
+    .hub-dropdown-dev { grid-column: 1 / -1; padding-top: 12px; border-top: 1px solid #eee; }
+
+    /* Section logo (game brand next to BI switcher) — empty on hub */
+    .nav-section-logo { display: flex; align-items: center; gap: 10px; }
+
+    /* Nav links */
+    .nav-links { display: flex; align-items: center; gap: 28px; margin: 0 auto; }
+    .nav-links a {
+      font-size: 14px; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--text-primary); text-decoration: none;
+      transition: color 0.15s; white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--bi-green); }
+    .nav-links .has-dropdown { display: flex; align-items: center; gap: 3px; }
+    .nav-links .has-dropdown::after { content: '▾'; font-size: 9px; }
+
+    /* Nav right */
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-account { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); text-decoration: none; cursor: pointer; }
+    .nav-account svg { width: 16px; height: 16px; }
+
+    /* ── HERO ── */
+    .hero {
+      height: 100vh; min-height: 600px;
+      background: #0a0a0a url('https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg') center center / cover no-repeat;
+      display: flex; align-items: flex-end; justify-content: flex-start;
+      padding: 80px 64px; position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.15) 100%);
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 640px; }
+    .hero-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--bi-green); margin-bottom: 20px; }
+    .hero-headline { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(52px, 8vw, 96px); font-weight: 900; line-height: 0.92; color: #fff; text-transform: uppercase; margin-bottom: 24px; }
+    .hero-headline .highlight { background: var(--bi-green); color: #fff; padding: 0 8px 4px; display: inline; }
+    .hero-sub { font-size: 16px; font-weight: 400; color: rgba(255,255,255,0.72); line-height: 1.6; margin-bottom: 36px; max-width: 480px; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--bi-green); color: #fff; font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; padding: 14px 28px; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--bi-green-dark); }
+    .btn-outline { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid rgba(255,255,255,0.5); color: #fff; font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; padding: 13px 28px; transition: border-color 0.2s; }
+    .btn-outline:hover { border-color: #fff; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-scroll { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 1; color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .hero-scroll::after { content: ''; width: 1px; height: 40px; background: rgba(255,255,255,0.25); }
+
+    /* ── GAMES SECTION ── */
+    .section { padding: 80px 64px; }
+    .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 40px; }
+    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px, 4vw, 40px); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; }
+    .section-link { font-size: 13px; font-weight: 600; color: var(--bi-green); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+    .section-link:hover { color: var(--bi-green-dark); }
+
+    /* Brand tiles grid */
+    .brands-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+    .brand-tile {
+      position: relative; overflow: hidden; cursor: pointer;
+      aspect-ratio: 16/10;
+      text-decoration: none;
+      display: block;
+    }
+    .brand-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease, filter 0.4s; filter: brightness(0.7) saturate(0.8); display: block; }
+    .brand-tile:hover img { transform: scale(1.05); filter: brightness(0.6) saturate(1); }
+    .brand-tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%); }
+    .brand-tile-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 24px; }
+    .brand-tile-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--bi-green); margin-bottom: 6px; }
+    .brand-tile-name { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; color: #fff; text-transform: uppercase; line-height: 1; margin-bottom: 10px; }
+    .brand-tile-desc { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.5; max-width: 240px; }
+    .brand-tile-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; opacity: 0; transform: translateY(6px); transition: opacity 0.3s, transform 0.3s; }
+    .brand-tile:hover .brand-tile-cta { opacity: 1; transform: translateY(0); }
+
+    /* ── NEWS ── */
+    .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .news-card { text-decoration: none; color: inherit; display: block; }
+    .news-card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; margin-bottom: 14px; transition: filter 0.3s; }
+    .news-card:hover .news-card-img { filter: brightness(0.9); }
+    .news-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .news-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; }
+    .tag-dayz { background: rgba(139,0,0,0.15); color: #8b0000; }
+    .tag-arma { background: rgba(90,122,46,0.15); color: #3a6010; }
+    .tag-enfusion { background: rgba(0,163,224,0.12); color: #0080b0; }
+    .news-date { font-size: 11px; color: var(--text-secondary); }
+    .news-card-title { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+    .news-card:hover .news-card-title { color: var(--bi-green); }
+    .news-card-excerpt { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── HUB VALUE STRIP ── */
+    .hub-value-strip { background: var(--bg-dark); color: #fff; padding: 64px; display: grid; grid-template-columns: 1fr 3fr; gap: 48px; align-items: center; }
+    .hub-value-strip h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; text-transform: uppercase; color: var(--bi-green); line-height: 1.1; }
+    .hub-value-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .pillar h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .pillar p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.65; }
+
+    /* ── FOOTER ── */
+    footer { background: #111; color: rgba(255,255,255,0.5); padding: 48px 64px; display: grid; grid-template-columns: 1fr 3fr; gap: 48px; align-items: start; }
+    .footer-brand { display: flex; flex-direction: column; gap: 12px; }
+    .footer-brand .bi-name { font-size: 15px; font-weight: 700; color: #fff; }
+    .footer-brand p { font-size: 12px; line-height: 1.6; }
+    .footer-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+    .footer-col h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+    .footer-col a { display: block; font-size: 12px; color: rgba(255,255,255,0.45); text-decoration: none; padding: 3px 0; transition: color 0.15s; }
+    .footer-col a:hover { color: var(--bi-green); }
+    .footer-bottom { background: #0a0a0a; padding: 16px 64px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-bottom span { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .footer-bottom a { font-size: 11px; color: rgba(255,255,255,0.3); text-decoration: none; }
+    .footer-bottom a:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── UTILS ── */
+    .bg-light { background: var(--bg-light); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAV — HUB VARIANT (light gray)
+════════════════════════════════════════ -->
+<nav id="main-nav">
+
+  <!-- Hub switcher (shared on ALL pages) -->
+  <div class="nav-hub-switcher">
+    <button class="nav-hub-btn" id="hub-btn" aria-expanded="false" onclick="toggleHub(this)">
+      <!-- BI Arrow Logo -->
+      <svg class="bi-logo" viewBox="0 0 61 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M36.5263 1.59133C36.251 2.4754 35.3267 5.34373 34.4614 7.96648L32.8882 12.7405L31.1478 12.7994C23.4389 13.0843 15.9956 16.4438 9.10282 22.7698C6.80196 24.8817 4.75675 27.5045 3.25234 30.2746L2.78037 31.139H4.4421H6.10383L6.96911 29.7343C9.06349 26.3061 11.1382 24.0271 14.3535 21.6107C18.7389 18.3101 23.7733 16.1392 28.5815 15.4713C29.7614 15.3141 32.0033 15.1668 32.0033 15.2552C32.0033 15.373 30.7643 18.8406 28.021 26.424C26.5166 30.5595 25.2285 34.1252 25.1498 34.3511L25.0023 34.7735H20.4498H15.8972L13.9012 37.5927C12.7999 39.1448 11.8855 40.4414 11.8658 40.4905C11.8461 40.5298 12.0231 40.5004 12.2591 40.412C13.3702 40.019 16.8903 39.2528 19.5648 38.8108C21.3249 38.5161 23.6553 38.192 23.6946 38.2312C23.7143 38.2509 22.3573 42.0524 20.6661 46.6889L17.6081 55.1072H16.1234C13.0261 55.1072 10.4302 54.5178 7.98188 53.2703C5.90718 52.2094 4.30444 50.7949 3.03602 48.9089C2.31823 47.8382 1.94458 47.0622 1.57094 45.8539C1.32512 45.0681 1.25629 44.96 0.676162 44.3903C0.322183 44.0563 0.0272013 43.8009 0.00753588 43.8206C-0.0121296 43.8402 0.00753588 44.1938 0.0566996 44.5966C0.322183 46.9934 1.0793 49.1545 2.32806 51.0307C3.09502 52.1996 4.9829 54.0562 6.21199 54.8518C8.93566 56.6298 12.4558 57.6612 15.8087 57.6612C16.2807 57.6612 16.6642 57.671 16.6642 57.6907C16.6642 57.7103 16.0644 59.3606 15.3368 61.3547C14.6091 63.3487 14.0094 64.9892 14.0094 64.999C14.0094 65.0187 14.4027 64.7436 14.8746 64.39L15.7399 63.7613L16.9592 60.7063C17.9523 58.2015 18.2079 57.6514 18.3751 57.6219C18.4931 57.5924 19.024 57.5335 19.5648 57.4647C24.7074 56.9048 30.666 54.4 35.4054 50.8244C40.1743 47.2291 44.186 42.3667 46.2214 37.7106L46.6934 36.6399H53.1928H59.6922L60.351 35.7067L61 34.7735H54.2252C50.0955 34.7735 47.4407 34.7342 47.4407 34.6851C47.4407 34.636 47.5685 34.0859 47.7258 33.4769C48.2863 31.306 48.3748 30.5889 48.3649 28.143C48.3649 26.1686 48.3453 25.756 48.1486 24.8817C47.5193 21.9938 46.3099 19.6461 44.4613 17.7208C43.3699 16.5813 42.603 15.9624 41.305 15.1864C40.1054 14.4104 38.8868 13.7049 37.9822 13.4209C37.0638 13.1369 36.251 12.8192 35.79 12.7405L34.4614 12.5046L36.5263 7.96648C38.0622 3.90932 38.3949 2.63363 38.4245 1.59133C38.4441 0.902161 38.3649 0.734041 37.9822 0.803813C37.5794 0.873585 37.0877 1.17775 36.5263 1.59133Z" fill="currentColor"/>
+        <path d="M36.5165 15.8249C39.5548 16.6206 42.2981 18.4869 43.8517 20.8248C44.4515 21.7187 45.2086 23.3493 45.4643 24.2629C46.2509 27.1214 46.1132 30.4416 45.071 33.8109L44.776 34.7735H36.0248C27.7162 34.7735 27.2639 34.7637 27.3229 34.5967C27.3622 34.5083 29.0829 30.1764 31.1478 24.9701L34.9039 15.5106L35.3366 15.5695C35.5725 15.6088 36.1035 15.7169 36.5165 15.8249Z" fill="currentColor"/>
+        <path d="M43.9009 36.8658C43.9009 36.9248 43.5862 37.5633 43.2027 38.2607C40.6561 42.9365 36.9983 46.8755 32.2982 49.9894C29.7614 51.6692 27.3917 52.8283 24.6287 53.732C22.6917 54.3705 19.5353 55.0581 19.3584 54.8813C19.2994 54.8223 25.8578 38.1527 26.0053 37.9857C26.1921 37.7696 34.9531 37.0918 40.7052 36.8462C43.5764 36.7185 43.9009 36.7185 43.9009 36.8658Z" fill="currentColor"/>
+      </svg>
+      <div class="bi-wordmark">
+        <span>Bohemia</span>
+        <span>Interactive</span>
+      </div>
+      <span class="chevron">▾</span>
+    </button>
+
+    <!-- Hub Dropdown -->
+    <div class="hub-dropdown" id="hub-dropdown">
+      <div class="hub-dropdown-section">
+        <h4>Games</h4>
+        <a href="arma.html"><span class="dot"></span> Arma Reforger</a>
+        <a href="dayz.html"><span class="dot"></span> DayZ</a>
+        <a href="#"><span class="dot"></span> Arma 3</a>
+        <a href="#"><span class="dot"></span> All games →</a>
+      </div>
+      <div class="hub-dropdown-section">
+        <h4>Hub</h4>
+        <a href="#"><span class="dot"></span> Store</a>
+        <a href="https://careers.bohemia.net" target="_blank"><span class="dot"></span> Careers</a>
+        <a href="#"><span class="dot"></span> Company</a>
+        <a href="#"><span class="dot"></span> Forums</a>
+        <a href="#"><span class="dot"></span> Wiki</a>
+      </div>
+      <div class="hub-dropdown-section hub-dropdown-dev">
+        <h4>Development</h4>
+        <a href="enfusion.html"><span class="dot"></span> Enfusion Engine</a>
+        <a href="#"><span class="dot"></span> Incubator</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav links -->
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="#games">Games</a>
+    <a href="#" class="has-dropdown">Community</a>
+    <a href="https://careers.bohemia.net" target="_blank" class="has-dropdown">Careers</a>
+    <a href="#" class="has-dropdown">Company</a>
+    <a href="#">Shop</a>
+  </nav>
+
+  <!-- Account -->
+  <div class="nav-right">
+    <a href="#" class="nav-account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Account
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-label">Bohemia Interactive — bohemia.net</p>
+    <h1 class="hero-headline">
+      GAMES<br>
+      WORTH<br>
+      <span class="highlight">PLAYING</span>
+    </h1>
+    <p class="hero-sub">Creators of Arma, DayZ, and the Enfusion engine. One platform. Infinite worlds. Explore all Bohemia Interactive games, community tools, and content — in one place.</p>
+    <div class="hero-actions">
+      <a href="#games" class="btn-primary">Explore Games</a>
+      <a href="#news" class="btn-outline">Latest News</a>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     GAMES
+════════════════════════════════════════ -->
+<section class="section" id="games">
+  <div class="section-header">
+    <h2 class="section-title">Our Games</h2>
+    <a href="#" class="section-link">All games →</a>
+  </div>
+  <div class="brands-grid">
+    <!-- DayZ -->
+    <a href="dayz.html" class="brand-tile">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/221100/library_hero.jpg" alt="DayZ" loading="lazy">
+      <div class="brand-tile-overlay"></div>
+      <div class="brand-tile-content">
+        <p class="brand-tile-tag">Survival</p>
+        <h3 class="brand-tile-name">DayZ</h3>
+        <p class="brand-tile-desc">This is your story. Survive the post-apocalyptic open world of Chernarus.</p>
+        <span class="brand-tile-cta">Explore DayZ →</span>
+      </div>
+    </a>
+    <!-- Arma Reforger -->
+    <a href="arma.html" class="brand-tile">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg" alt="Arma Reforger" loading="lazy">
+      <div class="brand-tile-overlay"></div>
+      <div class="brand-tile-content">
+        <p class="brand-tile-tag">Military Simulation</p>
+        <h3 class="brand-tile-name">Arma Reforger</h3>
+        <p class="brand-tile-desc">Choice is yours. Return to Everon in the next step toward Arma 4.</p>
+        <span class="brand-tile-cta">Explore Arma →</span>
+      </div>
+    </a>
+    <!-- Enfusion / Tech -->
+    <a href="enfusion.html" class="brand-tile">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/107410/library_hero.jpg" alt="Enfusion" loading="lazy" style="filter: brightness(0.5) saturate(0.2) sepia(0.4);">
+      <div class="brand-tile-overlay" style="background: linear-gradient(to top, rgba(0,20,40,0.95) 0%, rgba(0,163,224,0.1) 60%, rgba(0,0,0,0) 100%);"></div>
+      <div class="brand-tile-content">
+        <p class="brand-tile-tag" style="color: #00A3E0;">Technology</p>
+        <h3 class="brand-tile-name">Enfusion Engine</h3>
+        <p class="brand-tile-desc">The proprietary engine powering the next generation of Bohemia games.</p>
+        <span class="brand-tile-cta">Explore Enfusion →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     NEWS
+════════════════════════════════════════ -->
+<section class="section bg-light" id="news">
+  <div class="section-header">
+    <h2 class="section-title">Latest News</h2>
+    <a href="#" class="section-link">All news →</a>
+  </div>
+  <div class="news-grid">
+    <a href="dayz.html" class="news-card">
+      <img class="news-card-img" src="https://cdn.akamai.steamstatic.com/steam/apps/221100/ss_1d9e0f9.1920x1080.jpg" alt="DayZ Badlands" loading="lazy" onerror="this.src='https://cdn.akamai.steamstatic.com/steam/apps/221100/header.jpg'">
+      <div class="news-card-meta">
+        <span class="news-tag tag-dayz">DayZ</span>
+        <span class="news-date">Apr 7, 2026</span>
+      </div>
+      <h3 class="news-card-title">DayZ Badlands — New Expansion Coming 2026</h3>
+      <p class="news-card-excerpt">Explore a brand-new region with fresh challenges, environments, and survivor stories. Wishlist now on Steam.</p>
+    </a>
+    <a href="arma.html" class="news-card">
+      <img class="news-card-img" src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/ss_4cace85.1920x1080.jpg" alt="Arma Reforger" loading="lazy" onerror="this.src='https://cdn.akamai.steamstatic.com/steam/apps/1874880/header.jpg'">
+      <div class="news-card-meta">
+        <span class="news-tag tag-arma">Arma Reforger</span>
+        <span class="news-date">Mar 28, 2026</span>
+      </div>
+      <h3 class="news-card-title">Kolguyev Island — New Map Reveal</h3>
+      <p class="news-card-excerpt">A new island theatre of operations arrives in Arma Reforger, bringing new terrain, weather, and gameplay opportunities.</p>
+    </a>
+    <a href="dayz.html" class="news-card">
+      <img class="news-card-img" src="https://cdn.akamai.steamstatic.com/steam/apps/221100/header.jpg" alt="DayZ Update" loading="lazy">
+      <div class="news-card-meta">
+        <span class="news-tag tag-dayz">DayZ</span>
+        <span class="news-date">Mar 12, 2026</span>
+      </div>
+      <h3 class="news-card-title">DayZ Update 1.29 &amp; DayZ in 2026</h3>
+      <p class="news-card-excerpt">A major update arrives alongside a developer roadmap sharing what's in store for DayZ throughout 2026.</p>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     HUB VALUE STRIP
+════════════════════════════════════════ -->
+<div class="hub-value-strip">
+  <div>
+    <h2>One Hub.<br>Infinite<br>Worlds.</h2>
+  </div>
+  <div class="hub-value-pillars">
+    <div class="pillar">
+      <h3>Unified Discovery</h3>
+      <p>One domain, one account. Everything from game pages and patch notes to careers and community tools — found in one place, under one roof.</p>
+    </div>
+    <div class="pillar">
+      <h3>Brand Freedom</h3>
+      <p>DayZ is dark and atmospheric. Arma is tactical and precise. Enfusion is clean and futuristic. Every brand lives fully within its own identity.</p>
+    </div>
+    <div class="pillar">
+      <h3>Built to Scale</h3>
+      <p>Arma 4. DayZ 2. What comes next. The hub is designed to welcome new brands without rebuilding from scratch.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer>
+  <div class="footer-brand">
+    <span class="bi-name">Bohemia Interactive</span>
+    <p>Game developers since 1999. Creators of the Arma series, DayZ, and the Enfusion engine.</p>
+  </div>
+  <div class="footer-links">
+    <div class="footer-col">
+      <h4>Games</h4>
+      <a href="arma.html">Arma Reforger</a>
+      <a href="dayz.html">DayZ</a>
+      <a href="#">Arma 3</a>
+      <a href="#">Vigor</a>
+      <a href="#">Silica</a>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <a href="#">Forums</a>
+      <a href="#">Workshop</a>
+      <a href="#">Feedback Tracker</a>
+      <a href="#">Wiki</a>
+      <a href="#">Discord</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About BI</a>
+      <a href="https://careers.bohemia.net" target="_blank">Careers</a>
+      <a href="enfusion.html">Enfusion Engine</a>
+      <a href="#">Incubator</a>
+      <a href="#">Press</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#">Help Center</a>
+      <a href="#">Store</a>
+      <a href="#">Status</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Cookie Settings</a>
+    </div>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2026 Bohemia Interactive a.s. All rights reserved.</span>
+  <div style="display:flex;gap:24px;">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Cookie Policy</a>
+  </div>
+</div>
+
+<script>
+  // Hub switcher dropdown
+  function toggleHub(btn) {
+    const dropdown = document.getElementById('hub-dropdown');
+    const isOpen = dropdown.classList.contains('open');
+    dropdown.classList.toggle('open');
+    btn.setAttribute('aria-expanded', !isOpen);
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('hub-btn').contains(e.target)) {
+      document.getElementById('hub-dropdown').classList.remove('open');
+      document.getElementById('hub-btn').setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Nav scroll — hub page goes slightly darker on scroll
+  window.addEventListener('scroll', function() {
+    const nav = document.getElementById('main-nav');
+    if (window.scrollY > 20) {
+      nav.style.background = '#e4e4e0';
+      nav.style.boxShadow = '0 2px 12px rgba(0,0,0,0.1)';
+    } else {
+      nav.style.background = 'var(--bg-light)';
+      nav.style.boxShadow = 'none';
+    }
+  }, { passive: true });
+</script>
+</body>
+</html>

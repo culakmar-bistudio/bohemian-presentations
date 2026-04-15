@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Websites Strategy 2026–2027 — Bohemia Interactive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Barlow+Condensed:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bi-green: #6ba539;
+      --bi-green-dark: #417714;
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #181818;
+      --text: #f0f0ee;
+      --dim: rgba(240,240,238,0.45);
+      --border: rgba(255,255,255,0.08);
+      --slide-pad: clamp(40px, 6vw, 96px);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Barlow', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── DECK ── */
+    #deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.55s cubic-bezier(0.4,0,0.2,1);
+      transform: translateY(30px);
+      overflow-y: auto;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+      z-index: 2;
+    }
+    .slide.exit {
+      opacity: 0;
+      transform: translateY(-30px);
+      z-index: 1;
+    }
+
+    /* ── NAV BAR ── */
+    #nav-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-right: 32px;
+    }
+    .nav-logo svg { width: 22px; height: 24px; }
+    .nav-progress {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+    }
+    .nav-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .nav-dot.active { background: var(--bi-green); transform: scale(1.4); }
+    .nav-dot:hover:not(.active) { background: rgba(255,255,255,0.5); }
+    .nav-label {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+    .slide-counter {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+      margin-left: 24px;
+    }
+
+    /* ── ARROW CONTROLS ── */
+    .arrow-btn {
+      position: fixed;
+      bottom: 32px;
+      background: none;
+      border: 1px solid var(--border);
+      color: rgba(255,255,255,0.5);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .arrow-btn:hover { border-color: var(--bi-green); color: var(--bi-green); background: rgba(107,165,57,0.1); }
+    #btn-prev { right: 100px; }
+    #btn-next { right: 44px; }
+
+    /* ── COMMON LAYOUT ── */
+    .slide-inner {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: calc(52px + 64px) var(--slide-pad) 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .slide-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--bi-green);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .slide-tag::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 2px;
+      background: var(--bi-green);
+    }
+
+    .slide-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(42px, 7vw, 90px);
+      font-weight: 900;
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: #fff;
+      margin-bottom: 32px;
+    }
+    .slide-title .hl {
+      background: var(--bi-green);
+      padding: 0 8px;
+      display: inline;
+    }
+    .slide-title .dim { color: rgba(255,255,255,0.25); }
+
+    .slide-body {
+      font-size: clamp(15px, 1.6vw, 18px);
+      line-height: 1.65;
+      color: rgba(240,240,238,0.7);
+      max-width: 680px;
+    }
+    .slide-body strong { color: #fff; font-weight: 600; }
+
+    /* ── 2-COL LAYOUT ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    @media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── STAT CARDS ── */
+    .stats-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .stat-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      flex: 1;
+      min-width: 150px;
+    }
+    .stat-card .num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--bi-green);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-card .label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* ── DOMAIN CHAOS GRID ── */
+    .domain-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 28px;
+    }
+    .domain-pill {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 5px 10px;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    .domain-pill.old { border-color: rgba(255,80,80,0.4); color: rgba(255,120,120,0.8); background: rgba(255,80,80,0.06); }
+    .domain-pill.new { border-color: rgba(107,165,57,0.5); color: rgba(140,200,80,0.9); background: rgba(107,165,57,0.08); }
+    .domain-pill.dim { border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
+
+    /* ── HUB DIAGRAM ── */
+    .hub-diagram {
+      position: relative;
+      margin-top: 32px;
+    }
+    .hub-diagram svg { width: 100%; height: auto; }
+
+    /* ── TYPE GRID (4 types) ── */
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+    @media (max-width: 900px) { .type-grid { grid-template-columns: repeat(2,1fr); } }
+    .type-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 24px;
+      position: relative;
+      cursor: pointer;
+      transition: border-color 0.25s, transform 0.2s;
+    }
+    .type-card:hover { border-color: rgba(107,165,57,0.5); transform: translateY(-3px); }
+    .type-card.active-card { border-color: var(--bi-green); }
+    .type-card .tc-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--bi-green);
+      margin-bottom: 10px;
+    }
+    .type-card .tc-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .type-card .tc-desc {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--dim);
+    }
+    .type-card .tc-badge {
+      position: absolute;
+      top: 16px; right: 16px;
+      font-size: 18px;
+      opacity: 0.5;
+    }
+
+    /* ── TYPE DETAIL SLIDE ── */
+    .type-detail-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+    .type-detail-icon {
+      font-size: 56px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .type-props {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .type-prop {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--dim);
+    }
+    .type-prop.yes { border-color: rgba(107,165,57,0.5); color: #8bc34a; background: rgba(107,165,57,0.08); }
+    .type-prop.no { border-color: rgba(255,80,80,0.3); color: rgba(255,120,120,0.7); background: rgba(255,80,80,0.06); }
+
+    /* ── EXAMPLE CARDS ── */
+    .example-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 32px;
+    }
+    @media (max-width: 800px) { .example-row { grid-template-columns: 1fr; } }
+    .example-card {
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--bg3);
+    }
+    .example-card .ex-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+      background: var(--bg2);
+    }
+    .example-card .ex-body {
+      padding: 16px;
+    }
+    .example-card .ex-src {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--bi-green);
+      margin-bottom: 6px;
+    }
+    .example-card .ex-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .example-card .ex-text {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--dim);
+    }
+
+    /* ── NAV ANATOMY DIAGRAM ── */
+    .nav-anatomy {
+      border: 1px solid var(--border);
+      background: #0d0d0d;
+      padding: 0;
+      margin-top: 28px;
+      overflow: hidden;
+    }
+    .nav-anatomy-bar {
+      display: flex;
+      align-items: center;
+      height: 56px;
+      padding: 0 20px;
+      gap: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .anat-hub {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-right: 16px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      margin-right: 16px;
+    }
+    .anat-hub-icon {
+      width: 22px; height: 24px;
+      background: var(--bi-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .anat-hub-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    .anat-game { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-right: auto; }
+    .anat-game.dayz { color: #c0392b; }
+    .anat-game.arma { color: #c49020; }
+    .anat-game.enfusion { color: #00A3E0; }
+    .anat-game.hub { color: #6ba539; }
+    .anat-links { display: flex; gap: 18px; margin: 0 auto; }
+    .anat-link { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+    .anat-cta { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 6px 14px; }
+    .anat-cta.dayz { background: #c0392b; color: #fff; }
+    .anat-cta.arma { background: #c49020; color: #fff; }
+    .anat-cta.enfusion { background: #00A3E0; color: #fff; }
+    .anat-label-row {
+      display: flex;
+      padding: 8px 20px;
+      gap: 0;
+    }
+    .anat-annotation {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .anat-annotation.shared { color: var(--bi-green); }
+    .anat-annotation.brand { color: rgba(255,255,255,0.4); }
+    .anat-bracket {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .anat-bracket-bar { height: 1px; background: currentColor; }
+    .anat-bracket-text { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 28px;
+      font-size: 13px;
+    }
+    .compare-table th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-align: left;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .col-type { color: #fff; font-weight: 600; }
+    .compare-table .col-def { color: var(--dim); }
+    .compare-table .col-bi { color: rgba(107,165,57,0.9); font-size: 12px; }
+    .check { color: var(--bi-green); font-weight: 700; }
+    .cross { color: rgba(255,100,100,0.7); }
+    .maybe { color: rgba(255,200,60,0.8); }
+
+    /* ── SLIDE 1: COVER ── */
+    #slide-0 {
+      background: var(--bg);
+    }
+    #slide-0 .bg-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(107,165,57,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(107,165,57,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    #slide-0 .bg-glow {
+      position: absolute;
+      bottom: -200px; right: -200px;
+      width: 800px; height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(107,165,57,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    #slide-0 .slide-inner { position: relative; z-index: 1; justify-content: center; min-height: 100vh; }
+    .cover-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--bi-green);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .cover-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px; height: 2px;
+      background: var(--bi-green);
+    }
+    .cover-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(56px, 9vw, 120px);
+      font-weight: 900;
+      line-height: 0.88;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 40px;
+    }
+    .cover-title .green { color: var(--bi-green); }
+    .cover-sub {
+      font-size: clamp(16px, 1.8vw, 20px);
+      color: rgba(240,240,238,0.55);
+      line-height: 1.55;
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+    .cover-meta {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    .cover-meta-item {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .cover-meta-sep { color: rgba(255,255,255,0.1); font-size: 20px; }
+
+    /* ── SLIDE 2: PROBLEM ── */
+    #slide-1 { background: var(--bg); }
+
+    /* ── SLIDE 3: THESIS ── */
+    #slide-2 { background: var(--bg); }
+    .thesis-quote {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(26px, 4vw, 48px);
+      font-weight: 700;
+      line-height: 1.2;
+      color: rgba(255,255,255,0.9);
+      border-left: 4px solid var(--bi-green);
+      padding-left: 28px;
+      margin: 32px 0;
+      font-style: italic;
+    }
+
+    /* ── SLIDE 4: WHAT IS WHAT ── */
+    #slide-3 { background: var(--bg); }
+
+    /* ── SLIDES 5–8: TYPE DETAIL ── */
+    #slide-4, #slide-5, #slide-6, #slide-7 { background: var(--bg); }
+    .type-banner {
+      position: absolute;
+      right: 0; top: 52px;
+      width: 38%;
+      bottom: 0;
+      overflow: hidden;
+    }
+    .type-banner img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.35;
+    }
+    .type-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--bg) 10%, transparent 60%);
+    }
+    .type-banner.solid {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    .type-slide-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 62%;
+    }
+    @media (max-width: 860px) {
+      .type-banner { display: none; }
+      .type-slide-inner { max-width: 100%; }
+    }
+
+    /* ── SLIDE 9: DEMO ── */
+    #slide-8 { background: var(--bg); }
+    .demo-tiles {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 32px;
+    }
+    @media (max-width: 900px) { .demo-tiles { grid-template-columns: repeat(2,1fr); } }
+    .demo-tile {
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 16/10;
+      display: flex;
+      align-items: flex-end;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      text-decoration: none;
+    }
+    .demo-tile:hover { border-color: rgba(107,165,57,0.6); }
+    .demo-tile img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+      transition: opacity 0.3s, transform 0.5s;
+    }
+    .demo-tile:hover img { opacity: 0.7; transform: scale(1.04); }
+    .demo-tile-label {
+      position: relative;
+      z-index: 1;
+      padding: 10px 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      width: 100%;
+    }
+    .demo-tile-label .name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .demo-tile-label .url { font-size: 10px; color: var(--dim); margin-top: 2px; }
+    .demo-tile.hub .name { color: var(--bi-green); }
+    .demo-tile.dayz .name { color: #e74c3c; }
+    .demo-tile.arma .name { color: #c49020; }
+    .demo-tile.ef .name { color: #00A3E0; }
+
+    /* ── SLIDE 10: CONCLUSION ── */
+    #slide-9 { background: var(--bg); }
+    .conclusion-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 32px;
+    }
+    @media (max-width: 800px) { .conclusion-grid { grid-template-columns: 1fr; } }
+    .conc-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+    .conc-card .cc-icon { font-size: 28px; margin-bottom: 14px; }
+    .conc-card .cc-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 8px; }
+    .conc-card .cc-text { font-size: 13px; line-height: 1.55; color: var(--dim); }
+
+    /* ── IFRAMES PREVIEW ── */
+    .iframe-wrap {
+      position: relative;
+      width: 100%;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: #000;
+    }
+    .iframe-wrap iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: none;
+      transform-origin: top left;
+    }
+    .iframe-label {
+      position: absolute;
+      top: 8px; left: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(0,0,0,0.7);
+      padding: 3px 8px;
+      color: var(--bi-green);
+      z-index: 10;
+    }
+
+    /* ── WORD DIAGRAM (horizontal flow) ── */
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 32px 0;
+      overflow-x: auto;
+    }
+    .flow-node {
+      flex-shrink: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      text-align: center;
+      min-width: 140px;
+    }
+    .flow-node.hub-node { border-color: var(--bi-green); background: rgba(107,165,57,0.08); }
+    .flow-node .fn-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .flow-node .fn-sub { font-size: 10px; color: var(--dim); margin-top: 4px; }
+    .flow-arrow {
+      flex-shrink: 0;
+      font-size: 20px;
+      color: rgba(255,255,255,0.2);
+      padding: 0 4px;
+    }
+
+    /* ── SECTION DIVIDER SLIDE ── */
+    .divider-slide { background: var(--bg2); }
+    .divider-slide .slide-inner { justify-content: center; }
+    .divider-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(80px, 14vw, 200px);
+      font-weight: 900;
+      line-height: 1;
+      color: rgba(255,255,255,0.04);
+      position: absolute;
+      right: var(--slide-pad);
+      bottom: 80px;
+      letter-spacing: -0.04em;
+    }
+
+    /* ── SCREENSHOT FALLBACK PATTERNS ── */
+    .mock-screen {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      background: #0d0d0d;
+    }
+    .mock-screen-bar {
+      height: 28px;
+      background: #1a1a1a;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 6px;
+    }
+    .mock-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .mock-url {
+      flex: 1;
+      margin-left: 8px;
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 2px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .mock-url-text { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.03em; }
+    .mock-content { padding: 0; }
+    .mock-img { width: 100%; display: block; }
+
+    /* Responsive slide padding */
+    @media (max-width: 700px) {
+      .slide-inner { padding-top: calc(52px + 32px); }
+      .stats-row { gap: 10px; }
+    }
+
+    /* ── SCROLLBAR STYLE ── */
+    .slide::-webkit-scrollbar { width: 4px; }
+    .slide::-webkit-scrollbar-track { background: transparent; }
+    .slide::-webkit-scrollbar-thumb { background: rgba(107,165,57,0.4); border-radius: 2px; }
+
+    /* keyboard hint */
+    .key-hint {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.08em;
+      z-index: 50;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV BAR -->
+<nav id="nav-bar">
+  <div class="nav-logo">
+    <svg viewBox="0 0 61 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M36.5263 1.59133C36.251 2.4754 35.3267 5.34373 34.4614 7.96648L32.8882 12.7405L31.1478 12.7994C23.4389 13.0843 15.9956 16.4438 9.10282 22.7698C6.80196 24.8817 4.75675 27.5045 3.25234 30.2746L2.78037 31.139H4.4421H6.10383L6.96911 29.7343C9.06349 26.3061 11.1382 24.0271 14.3535 21.6107C18.7389 18.3101 23.7733 16.1392 28.5815 15.4713C29.7614 15.3141 32.0033 15.1668 32.0033 15.2552C32.0033 15.373 30.7643 18.8406 28.021 26.424C26.5166 30.5595 25.2285 34.1252 25.1498 34.3511L25.0023 34.7735H20.4498H15.8972L13.9012 37.5927C12.7999 39.1448 11.8855 40.4414 11.8658 40.4905C11.8461 40.5298 12.0231 40.5004 12.2591 40.412C13.3702 40.019 16.8903 39.2528 19.5648 38.8108C21.3249 38.5161 23.6553 38.192 23.6946 38.2312C23.7143 38.2509 22.3573 42.0524 20.6661 46.6889L17.6081 55.1072H16.1234C13.0261 55.1072 10.4302 54.5178 7.98188 53.2703C5.90718 52.2094 4.30444 50.7949 3.03602 48.9089C2.31823 47.8382 1.94458 47.0622 1.57094 45.8539C1.32512 45.0681 1.25629 44.96 0.676162 44.3903C0.322183 44.0563 0.0272013 43.8009 0.00753588 43.8206C-0.0121296 43.8402 0.00753588 44.1938 0.0566996 44.5966C0.322183 46.9934 1.0793 49.1545 2.32806 51.0307C3.09502 52.1996 4.9829 54.0562 6.21199 54.8518C8.93566 56.6298 12.4558 57.6612 15.8087 57.6612C16.2807 57.6612 16.6642 57.671 16.6642 57.6907C16.6642 57.7103 16.0644 59.3606 15.3368 61.3547C14.6091 63.3487 14.0094 64.9892 14.0094 64.999C14.0094 65.0187 14.4027 64.7436 14.8746 64.39L15.7399 63.7613L16.9592 60.7063C17.9523 58.2015 18.2079 57.6514 18.3751 57.6219C18.4931 57.5924 19.024 57.5335 19.5648 57.4647C24.7074 56.9048 30.666 54.4 35.4054 50.8244C40.1743 47.2291 44.186 42.3667 46.2214 37.7106L46.6934 36.6399H53.1928H59.6922L60.351 35.7067L61 34.7735H54.2252C50.0955 34.7735 47.4407 34.7342 47.4407 34.6851C47.4407 34.636 47.5685 34.0859 47.7258 33.4769C48.2863 31.306 48.3748 30.5889 48.3649 28.143C48.3649 26.1686 48.3453 25.756 48.1486 24.8817C47.5193 21.9938 46.3099 19.6461 44.4613 17.7208C43.3699 16.5813 42.603 15.9624 41.305 15.1864C39.4367 14.0861 37.9716 13.6441 35.7297 13.4083L34.5994 13.2904L35.867 9.48156C36.5656 7.38718 37.4407 4.76443 37.8044 3.64184L38.4829 1.59133H37.5094H36.5263Z" fill="#6ba539"/>
+      <path d="M36.5165 15.8249C39.5548 16.6206 42.2981 18.4869 43.8517 20.8248C44.4515 21.7187 45.2086 23.3493 45.4643 24.2629C46.2509 27.1214 46.1132 30.4416 45.071 33.8109L44.776 34.7735H36.0248C27.7162 34.7735 27.2639 34.7637 27.3229 34.5967C27.3622 34.5083 29.0829 30.1764 31.1478 24.9701L34.9039 15.5106L35.3366 15.5695C35.5725 15.6088 36.1035 15.7169 36.5165 15.8249Z" fill="#6ba539"/>
+      <path d="M43.9009 36.8658C43.9009 36.9248 43.5862 37.5633 43.2027 38.2607C40.6561 42.9365 36.9983 46.8755 32.2982 49.9894C29.7614 51.6692 27.3917 52.8283 24.6287 53.732C22.6917 54.3705 19.5353 55.0581 19.3584 54.8813C19.2994 54.8223 25.8578 38.1527 26.0053 37.9857C26.1921 37.7696 34.9531 37.0918 40.7052 36.8462C43.5764 36.7185 43.9009 36.7185 43.9009 36.8658Z" fill="#6ba539"/>
+    </svg>
+    Bohemia Interactive
+  </div>
+  <div class="nav-progress" id="nav-dots"></div>
+  <span class="nav-label" id="nav-slide-label"></span>
+  <span class="slide-counter" id="slide-counter"></span>
+</nav>
+
+<!-- DECK -->
+<div id="deck">
+
+  <!-- ═══ SLIDE 0: COVER ═══ -->
+  <div class="slide active" id="slide-0">
+    <div class="bg-lines"></div>
+    <div class="bg-glow"></div>
+    <div class="slide-inner">
+      <div class="cover-eyebrow">Bohemia Interactive · Internal Presentation</div>
+      <div class="cover-title">
+        Websites<br>Strategy<br><span class="green">2026–27</span>
+      </div>
+      <p class="cover-sub">
+        One hub. Infinite worlds. How consolidating 25+ fragmented websites under <strong style="color:#fff">bohemia.net</strong> unlocks creative freedom — not restricts it.
+      </p>
+      <div class="cover-meta">
+        <span class="cover-meta-item">Martin Baar</span>
+        <span class="cover-meta-sep">/</span>
+        <span class="cover-meta-item">Web &amp; Marketing</span>
+        <span class="cover-meta-sep">/</span>
+        <span class="cover-meta-item">April 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 1: THE PROBLEM ═══ -->
+  <div class="slide" id="slide-1">
+    <div class="slide-inner">
+      <div class="slide-tag">The Problem</div>
+      <h1 class="slide-title">25+ Sites.<br><span class="dim">Zero</span> System.</h1>
+      <div class="two-col">
+        <div>
+          <p class="slide-body">
+            Our web presence has grown organically for 15+ years — resulting in a <strong>fragmented patchwork</strong> of domains, tech stacks, and design languages with no shared foundation.
+          </p>
+          <div class="stats-row">
+            <div class="stat-card"><div class="num">25+</div><div class="label">Active web properties</div></div>
+            <div class="stat-card"><div class="num">3+</div><div class="label">CMS systems</div></div>
+            <div class="stat-card"><div class="num">0</div><div class="label">Unified design system</div></div>
+            <div class="stat-card"><div class="num">∞</div><div class="label">Maintenance debt</div></div>
+          </div>
+        </div>
+        <div>
+          <p class="slide-body" style="margin-bottom:16px; font-size:13px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600; color:rgba(255,100,100,0.6);">Current domain chaos</p>
+          <div class="domain-grid">
+            <span class="domain-pill old">arma3.com</span>
+            <span class="domain-pill old">dayz.com</span>
+            <span class="domain-pill old">bistudio.com</span>
+            <span class="domain-pill old">armaplatform.com</span>
+            <span class="domain-pill old">vigorgame.com</span>
+            <span class="domain-pill old">ylands.com</span>
+            <span class="domain-pill old">silica.com</span>
+            <span class="domain-pill old">enfusionengine.com</span>
+            <span class="domain-pill old">minidayz.com</span>
+            <span class="domain-pill old">armamobileops.com</span>
+            <span class="domain-pill old">forums.dayz.com</span>
+            <span class="domain-pill old">units.arma3.com</span>
+            <span class="domain-pill old">community.bistudio.com</span>
+            <span class="domain-pill old">ft.bistudio.com</span>
+            <span class="domain-pill old">store.bistudio.com</span>
+            <span class="domain-pill old">incubator.bistudio.com</span>
+            <span class="domain-pill dim">+ 10 legacy sites</span>
+          </div>
+          <div style="margin-top:16px; display:flex; align-items:center; gap:12px;">
+            <div style="width:2px; height:40px; background:var(--bi-green);"></div>
+            <div>
+              <p class="slide-body" style="margin-bottom:16px; font-size:13px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600; color:rgba(107,165,57,0.8);">The unified future</p>
+              <div class="domain-grid">
+                <span class="domain-pill new">bohemia.net</span>
+                <span class="domain-pill new">bohemia.net/games/dayz</span>
+                <span class="domain-pill new">bohemia.net/games/arma</span>
+                <span class="domain-pill new">bohemia.net/technology</span>
+                <span class="domain-pill new">bohemia.net/careers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 2: THESIS ═══ -->
+  <div class="slide" id="slide-2">
+    <div class="slide-inner">
+      <div class="slide-tag">The Proposal</div>
+      <h1 class="slide-title">One Hub.<br><span class="hl">Infinite</span> Worlds.</h1>
+      <div class="two-col">
+        <div>
+          <blockquote class="thesis-quote">
+            "Simple to use. Simple to manage. Sophisticated in possibilities."
+          </blockquote>
+          <p class="slide-body">
+            A unified hub at <strong>bohemia.net</strong> doesn't mean every game looks the same. It means every game benefits from the same solid foundation — shared navigation, shared accounts, shared analytics — while retaining <strong>complete visual independence</strong>.
+          </p>
+          <p class="slide-body" style="margin-top:16px;">
+            The key distinction is between two types of content under the hub:
+          </p>
+        </div>
+        <div>
+          <div style="display:flex; flex-direction:column; gap:16px; margin-top:8px;">
+            <div style="background:var(--bg3); border:1px solid var(--border); border-left:3px solid var(--bi-green); padding:20px 24px;">
+              <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:var(--bi-green); margin-bottom:8px;">Web Presentations</div>
+              <p style="font-size:13px; color:var(--dim); line-height:1.55;">Marketing-focused pages with brand identity, news, trailers, game profiles. Lives at <code style="font-size:11px; color:#8bc34a; background:rgba(107,165,57,0.1); padding:1px 5px;">bohemia.net/games/dayz</code></p>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; padding:0 8px;">
+              <div style="height:1px; flex:1; background:var(--border);"></div>
+              <span style="font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.1em;">vs.</span>
+              <div style="height:1px; flex:1; background:var(--border);"></div>
+            </div>
+            <div style="background:var(--bg3); border:1px solid var(--border); border-left:3px solid #00A3E0; padding:20px 24px;">
+              <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:#00A3E0; margin-bottom:8px;">Web Applications</div>
+              <p style="font-size:13px; color:var(--dim); line-height:1.55;">Standalone tools with own backend — Workshop, Feedback Tracker, Account system. Can deviate in design &amp; infrastructure.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 3: THE 4 TYPES ═══ -->
+  <div class="slide" id="slide-3">
+    <div class="slide-inner">
+      <div class="slide-tag">Taxonomy</div>
+      <h1 class="slide-title">Not All Web<br>Pages Are <span class="hl">Equal</span></h1>
+      <p class="slide-body" style="margin-bottom:0; max-width:100%;">Under the hub umbrella, four distinct formats serve different purposes. Understanding the difference helps brand managers know exactly what they can expect from each.</p>
+      <div class="type-grid" style="margin-top:28px;">
+        <div class="type-card">
+          <div class="tc-num">01</div>
+          <div class="tc-name">Presentation<br>Website</div>
+          <div class="tc-badge">🌐</div>
+          <div class="tc-desc">Full game presence with brand identity, news, trailers, community features. Permanent, evolving.</div>
+        </div>
+        <div class="type-card">
+          <div class="tc-num">02</div>
+          <div class="tc-name">Landing<br>Page</div>
+          <div class="tc-badge">🎯</div>
+          <div class="tc-desc">Single-purpose conversion page. Arma 4 launch, DayZ 2 announcement. Campaign-driven, high-impact.</div>
+        </div>
+        <div class="type-card">
+          <div class="tc-num">03</div>
+          <div class="tc-name">Microsite</div>
+          <div class="tc-badge">✨</div>
+          <div class="tc-desc">Self-contained mini-experience for events, DLCs, anniversaries. Maximum creative freedom.</div>
+        </div>
+        <div class="type-card">
+          <div class="tc-num">04</div>
+          <div class="tc-name">Web<br>Application</div>
+          <div class="tc-badge">⚙️</div>
+          <div class="tc-desc">Functional tools: Workshop, Feedback Tracker, Accounts. Own backend. Standalone.</div>
+        </div>
+      </div>
+
+      <!-- Comparison Table -->
+      <table class="compare-table" style="margin-top:28px;">
+        <thead>
+          <tr>
+            <th>Format</th>
+            <th>Navigation</th>
+            <th>Brand Freedom</th>
+            <th>Dynamic Content</th>
+            <th>Own Backend</th>
+            <th>BI Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-type">Presentation Website</td>
+            <td><span class="check">✓</span> Shared hub nav</td>
+            <td><span class="check">✓✓</span> Full visual identity</td>
+            <td><span class="check">✓</span> News, blog, changelogs</td>
+            <td><span class="cross">✗</span> Shared CMS</td>
+            <td class="col-bi">bohemia.net/games/dayz</td>
+          </tr>
+          <tr>
+            <td class="col-type">Landing Page</td>
+            <td><span class="maybe">~</span> Minimal / none</td>
+            <td><span class="check">✓✓✓</span> Maximum</td>
+            <td><span class="cross">✗</span> Static</td>
+            <td><span class="cross">✗</span> Shared CMS</td>
+            <td class="col-bi">Arma 4 launch page</td>
+          </tr>
+          <tr>
+            <td class="col-type">Microsite</td>
+            <td><span class="maybe">~</span> Minimal / custom</td>
+            <td><span class="check">✓✓✓</span> Maximum</td>
+            <td><span class="maybe">~</span> Optional</td>
+            <td><span class="cross">✗</span> Shared CMS</td>
+            <td class="col-bi">DayZ Anniversary event</td>
+          </tr>
+          <tr>
+            <td class="col-type">Web Application</td>
+            <td><span class="maybe">~</span> Custom / linked</td>
+            <td><span class="check">✓</span> Functional UX</td>
+            <td><span class="check">✓✓</span> Real-time</td>
+            <td><span class="check">✓</span> Own backend</td>
+            <td class="col-bi">Reforger Workshop</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 4: PRESENTATION WEBSITE ═══ -->
+  <div class="slide" id="slide-4">
+    <div class="type-banner">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/221100/library_hero.jpg" alt="DayZ hero" onerror="this.style.display='none'">
+    </div>
+    <div class="slide-inner" style="max-width:1200px; margin:0 auto; padding-left:var(--slide-pad); padding-right:calc(38% + var(--slide-pad));">
+      <div class="slide-tag">Format 01</div>
+      <h1 class="slide-title" style="font-size:clamp(38px,5.5vw,72px);">Presentation<br>Website</h1>
+      <div class="type-props">
+        <span class="type-prop yes">Shared Navigation</span>
+        <span class="type-prop yes">Full Brand Identity</span>
+        <span class="type-prop yes">News & Blog</span>
+        <span class="type-prop yes">Permanent</span>
+        <span class="type-prop no">Own Backend</span>
+      </div>
+      <p class="slide-body" style="margin-top:24px;">
+        The <strong>core game presence</strong> within bohemia.net. Each game gets its own fully branded section — distinct color palette, typography, visual language — while sharing the hub's navigation skeleton, account system, and CMS backend.
+      </p>
+      <p class="slide-body" style="margin-top:14px;">
+        Think <strong>ioi.dk</strong>: HITMAN and 007 First Light have completely different looks, but the same parent nav, same account login, same news infrastructure. Or <strong>rockstargames.com</strong>: GTA VI and RDR2 coexist with bold individual identities under one domain.
+      </p>
+      <div style="margin-top:24px;">
+        <p style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); margin-bottom:12px;">BI Examples</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:10px; height:10px; background:#c0392b; display:inline-block; flex-shrink:0;"></span>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7);"><strong style="color:#fff;">bohemia.net/games/dayz</strong> — survival horror, blood-red, condensed bold</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:10px; height:10px; background:#c49020; display:inline-block; flex-shrink:0;"></span>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7);"><strong style="color:#fff;">bohemia.net/games/arma-reforger</strong> — military gold, tactical structure</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:10px; height:10px; background:#00A3E0; display:inline-block; flex-shrink:0;"></span>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7);"><strong style="color:#fff;">bohemia.net/technology/enfusion</strong> — electric blue, tech-forward minimalism</span>
+          </div>
+        </div>
+      </div>
+      <!-- Nav Anatomy Diagram -->
+      <p style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); margin: 24px 0 10px;">What stays shared vs. what changes</p>
+      <div class="nav-anatomy">
+        <div class="nav-anatomy-bar">
+          <div class="anat-hub">
+            <div class="anat-hub-icon">
+              <svg width="12" height="13" viewBox="0 0 61 65" fill="none"><path d="M36.5 1.6L34.5 7.96L32.9 12.7L31.1 12.8C23.4 13.1 16 16.4 9.1 22.8L2.8 31.1H6.1L7 29.7C9.1 26.3 11.1 24 14.4 21.6C18.7 18.3 23.8 16.1 28.6 15.5L32 15.3L25.1 34.8H15.9L13.9 37.6L19.6 38.8L17.6 55.1H16.1C13 55.1 10.4 54.5 8 53.3C5.9 52.2 3 48.9 2.3 45.9L0 43.8C0.3 46.9 1.1 49.2 2.3 51L6.2 54.9C8.9 56.6 12.5 57.7 15.8 57.7L14 65L15.7 63.8L17 60.7C19 58.2 18.4 57.6 19.6 57.5C24.7 56.9 30.7 54.4 35.4 50.8C40.2 47.2 44.2 42.4 46.2 37.7H61L60.4 34.8H47.4C47.6 34.1 48.4 30.6 48.4 28.1C48.4 26.2 48.3 25.8 48.1 24.9C47.5 22 46.3 19.6 44.5 17.7C43.4 16.6 42.6 16 41.3 15.2L34.6 13.3L35.9 9.5L38.5 1.6H36.5Z" fill="white"/></svg>
+            </div>
+            <span class="anat-hub-label">BI Hub ▾</span>
+          </div>
+          <span class="anat-game dayz">DayZ</span>
+          <div class="anat-links">
+            <span class="anat-link">Game</span>
+            <span class="anat-link">Dev Hub</span>
+            <span class="anat-link">Forums</span>
+            <span class="anat-link">Merch</span>
+          </div>
+          <span class="anat-cta dayz">Buy DayZ</span>
+        </div>
+        <div class="nav-anatomy-bar" style="border-bottom:none;">
+          <div class="anat-hub">
+            <div class="anat-hub-icon" style="background:#c49020;">
+              <svg width="12" height="13" viewBox="0 0 61 65" fill="none"><path d="M36.5 1.6L34.5 7.96L32.9 12.7L31.1 12.8C23.4 13.1 16 16.4 9.1 22.8L2.8 31.1H6.1L7 29.7C9.1 26.3 11.1 24 14.4 21.6C18.7 18.3 23.8 16.1 28.6 15.5L32 15.3L25.1 34.8H15.9L13.9 37.6L19.6 38.8L17.6 55.1H16.1C13 55.1 10.4 54.5 8 53.3C5.9 52.2 3 48.9 2.3 45.9L0 43.8C0.3 46.9 1.1 49.2 2.3 51L6.2 54.9C8.9 56.6 12.5 57.7 15.8 57.7L14 65L15.7 63.8L17 60.7C19 58.2 18.4 57.6 19.6 57.5C24.7 56.9 30.7 54.4 35.4 50.8C40.2 47.2 44.2 42.4 46.2 37.7H61L60.4 34.8H47.4C47.6 34.1 48.4 30.6 48.4 28.1C48.4 26.2 48.3 25.8 48.1 24.9C47.5 22 46.3 19.6 44.5 17.7C43.4 16.6 42.6 16 41.3 15.2L34.6 13.3L35.9 9.5L38.5 1.6H36.5Z" fill="white"/></svg>
+            </div>
+            <span class="anat-hub-label">BI Hub ▾</span>
+          </div>
+          <span class="anat-game arma">Arma Reforger</span>
+          <div class="anat-links">
+            <span class="anat-link">Game</span>
+            <span class="anat-link">Roadmap</span>
+            <span class="anat-link">Workshop</span>
+            <span class="anat-link">Store</span>
+          </div>
+          <span class="anat-cta arma">Play Now</span>
+        </div>
+        <div style="display:flex; gap:0; padding:6px 20px; border-top:1px dashed rgba(107,165,57,0.2);">
+          <div style="display:flex; flex-direction:column; width:120px;">
+            <div style="font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--bi-green);">▲ SHARED</div>
+            <div style="font-size:9px; color:rgba(107,165,57,0.5); margin-top:2px;">same on all pages</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:flex-start; padding-left:16px;">
+            <div style="font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3);">↕ BRAND-SPECIFIC</div>
+            <div style="font-size:9px; color:rgba(255,255,255,0.2); margin-top:2px;">logo · nav links · cta color · full page design</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 5: LANDING PAGE ═══ -->
+  <div class="slide" id="slide-5">
+    <div class="type-banner">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg" alt="Arma hero" onerror="this.style.display='none'">
+    </div>
+    <div class="slide-inner" style="max-width:1200px; margin:0 auto; padding-left:var(--slide-pad); padding-right:calc(38% + var(--slide-pad));">
+      <div class="slide-tag">Format 02</div>
+      <h1 class="slide-title" style="font-size:clamp(38px,5.5vw,72px);">Landing<br>Page</h1>
+      <div class="type-props">
+        <span class="type-prop no">Shared Navigation</span>
+        <span class="type-prop yes">Maximum Freedom</span>
+        <span class="type-prop no">Dynamic Content</span>
+        <span class="type-prop yes">Campaign-driven</span>
+        <span class="type-prop yes">Short-lived</span>
+      </div>
+      <p class="slide-body" style="margin-top:24px;">
+        A <strong>single-purpose, conversion-focused page</strong> for a specific moment: a game announcement, a DLC launch, a pre-order campaign. Navigation is minimal or absent — the goal is one action.
+      </p>
+      <p class="slide-body" style="margin-top:14px;">
+        The page lives under the hub domain but behaves autonomously. Brand managers get <strong>maximum creative freedom</strong> — custom animations, unique layouts, full-bleed media — with no design constraints from the hub system.
+      </p>
+      <div style="margin-top:28px; background:var(--bg3); border:1px solid var(--border); padding:20px; border-left:3px solid #c49020;">
+        <p style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#c49020; margin-bottom:12px;">Upcoming BI Use Cases</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:13px; color:rgba(255,255,255,0.7); display:flex; align-items:baseline; gap:8px;">
+            <span style="font-weight:700; color:#c49020; font-variant-numeric:tabular-nums; font-family:'Barlow Condensed',sans-serif; font-size:15px;">→</span>
+            <span><strong style="color:#fff;">bohemia.net/arma4</strong> — Arma 4 announcement landing page, custom dark cinematic design, countdown, newsletter signup</span>
+          </div>
+          <div style="font-size:13px; color:rgba(255,255,255,0.7); display:flex; align-items:baseline; gap:8px;">
+            <span style="font-weight:700; color:#c49020; font-family:'Barlow Condensed',sans-serif; font-size:15px;">→</span>
+            <span><strong style="color:#fff;">bohemia.net/dayz2</strong> — DayZ 2 reveal page, single dramatic image, wishlist CTA, zero navigation</span>
+          </div>
+          <div style="font-size:13px; color:rgba(255,255,255,0.7); display:flex; align-items:baseline; gap:8px;">
+            <span style="font-weight:700; color:#c49020; font-family:'Barlow Condensed',sans-serif; font-size:15px;">→</span>
+            <span><strong style="color:#fff;">bohemia.net/games/dayz/badlands</strong> — DLC campaign landing, in-game visuals, animated reveal</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:20px; display:flex; gap:16px; align-items:center;">
+        <div style="flex:1; background:var(--bg3); border:1px solid var(--border); padding:16px; text-align:center;">
+          <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--dim); margin-bottom:6px;">Page structure</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="height:32px; background:rgba(107,165,57,0.2); border:1px solid rgba(107,165,57,0.3); display:flex; align-items:center; justify-content:center; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--bi-green);">Hero / Cinematic</div>
+            <div style="height:20px; background:rgba(255,255,255,0.05); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--dim);">Key Features</div>
+            <div style="height:20px; background:rgba(255,255,255,0.05); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--dim);">Social Proof</div>
+            <div style="height:28px; background:rgba(196,144,32,0.25); border:1px solid rgba(196,144,32,0.4); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#c49020;">BUY / WISHLIST CTA</div>
+          </div>
+        </div>
+        <div style="font-size:28px; color:rgba(255,255,255,0.15);">vs.</div>
+        <div style="flex:1; background:var(--bg3); border:1px solid var(--border); padding:16px;">
+          <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--dim); margin-bottom:6px; text-align:center;">Hub nav still accessible</div>
+          <p style="font-size:11px; color:rgba(255,255,255,0.45); line-height:1.5;">The BI hub nav button (top-left) remains available even on fully custom landing pages — it's the single thread connecting everything back to the ecosystem.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 6: MICROSITE ═══ -->
+  <div class="slide" id="slide-6">
+    <div class="type-banner solid" style="background:linear-gradient(135deg, #0a0f1a 0%, #0f1a2a 50%, #0a1520 100%);">
+      <div style="text-align:center; position:relative; z-index:1;">
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:rgba(0,163,224,0.6); margin-bottom:12px;">Example Microsite</div>
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:36px; font-weight:900; text-transform:uppercase; letter-spacing:0.04em; color:#fff; margin-bottom:6px;">DayZ</div>
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#c0392b; margin-bottom:20px;">10th Anniversary</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.3); margin-bottom:24px;">Event schedule · Community art · Giveaways</div>
+        <div style="display:inline-block; padding:8px 20px; border:1px solid rgba(192,57,43,0.5); color:#c0392b; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;">Visit the Microsite →</div>
+        <div style="margin-top:16px; font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:0.06em;">bohemia.net/dayz/10-years</div>
+      </div>
+    </div>
+    <div class="slide-inner" style="max-width:1200px; margin:0 auto; padding-left:var(--slide-pad); padding-right:calc(38% + var(--slide-pad));">
+      <div class="slide-tag">Format 03</div>
+      <h1 class="slide-title" style="font-size:clamp(38px,5.5vw,72px);">Microsite</h1>
+      <div class="type-props">
+        <span class="type-prop no">Shared Navigation</span>
+        <span class="type-prop yes">Maximum Freedom</span>
+        <span class="type-prop yes">Multi-page</span>
+        <span class="type-prop yes">Event / Campaign</span>
+        <span class="type-prop yes">Temporary</span>
+      </div>
+      <p class="slide-body" style="margin-top:24px;">
+        A <strong>small, self-contained web experience</strong> — typically 3–7 pages — built for a specific moment in a game's lifecycle. Events, DLC launches, anniversary celebrations, esports tournaments.
+      </p>
+      <p class="slide-body" style="margin-top:14px;">
+        Unlike a landing page, a microsite has its own light navigation and can include <strong>interactive elements</strong>, community features, or special tools. It lives under the hub domain but is fully visually decoupled.
+      </p>
+      <div style="margin-top:28px; display:flex; flex-direction:column; gap:12px;">
+        <p style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim);">Potential BI microsites</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div style="background:var(--bg3); border:1px solid var(--border); padding:14px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#c0392b; margin-bottom:6px;">DayZ 10th Anniversary</div>
+            <div style="font-size:11px; color:var(--dim);">Timeline, community art gallery, giveaways, dev retrospective</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.2); margin-top:6px;">bohemia.net/dayz/10-years</div>
+          </div>
+          <div style="background:var(--bg3); border:1px solid var(--border); padding:14px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#c49020; margin-bottom:6px;">Arma 4 Reveal</div>
+            <div style="font-size:11px; color:var(--dim);">Cinematic teaser, lore drops, countdown, Wishlist CTA</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.2); margin-top:6px;">bohemia.net/arma4</div>
+          </div>
+          <div style="background:var(--bg3); border:1px solid var(--border); padding:14px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#8bc34a; margin-bottom:6px;">Bohemia Dev Summit</div>
+            <div style="font-size:11px; color:var(--dim);">Event page, speaker lineup, session schedule, registration</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.2); margin-top:6px;">bohemia.net/summit-2026</div>
+          </div>
+          <div style="background:var(--bg3); border:1px solid var(--border); padding:14px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#00A3E0; margin-bottom:6px;">Enfusion SDK Launch</div>
+            <div style="font-size:11px; color:var(--dim);">Developer docs teaser, feature reveal, early access form</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.2); margin-top:6px;">bohemia.net/enfusion/sdk</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 7: WEB APP ═══ -->
+  <div class="slide" id="slide-7">
+    <div class="type-banner solid" style="background:#040608;">
+      <div style="width:100%; font-family:'Barlow',sans-serif; position:relative; z-index:1;">
+        <!-- Mock Workshop UI -->
+        <div style="border:1px solid rgba(0,163,224,0.2); background:#070a0e; overflow:hidden;">
+          <div style="height:36px; background:#0b0f14; border-bottom:1px solid rgba(0,163,224,0.12); display:flex; align-items:center; padding:0 14px; gap:10px;">
+            <span style="font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:800; letter-spacing:0.1em; color:#00A3E0;">WORKSHOP</span>
+            <span style="font-size:9px; color:rgba(0,163,224,0.4); letter-spacing:0.06em;">reforger.armaplatform.com</span>
+          </div>
+          <div style="padding:14px; display:flex; flex-direction:column; gap:8px;">
+            <div style="height:8px; background:rgba(0,163,224,0.15); width:60%;"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div style="background:#0f1318; border:1px solid rgba(0,163,224,0.1); padding:10px; height:60px;"></div>
+              <div style="background:#0f1318; border:1px solid rgba(0,163,224,0.1); padding:10px; height:60px;"></div>
+              <div style="background:#0f1318; border:1px solid rgba(0,163,224,0.1); padding:10px; height:60px;"></div>
+              <div style="background:#0f1318; border:1px solid rgba(0,163,224,0.1); padding:10px; height:60px;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px; font-size:10px; color:rgba(0,163,224,0.4); text-align:center; letter-spacing:0.08em; text-transform:uppercase;">Web Application — own server, own backend</div>
+      </div>
+    </div>
+    <div class="slide-inner" style="max-width:1200px; margin:0 auto; padding-left:var(--slide-pad); padding-right:calc(38% + var(--slide-pad));">
+      <div class="slide-tag">Format 04</div>
+      <h1 class="slide-title" style="font-size:clamp(38px,5.5vw,72px);">Web<br>Application</h1>
+      <div class="type-props">
+        <span class="type-prop yes">Own Backend</span>
+        <span class="type-prop yes">Real-time</span>
+        <span class="type-prop yes">User Auth</span>
+        <span class="type-prop no">Hub CMS</span>
+        <span class="type-prop yes">Standalone</span>
+      </div>
+      <p class="slide-body" style="margin-top:24px;">
+        <strong>Functional tools</strong> that require their own server, database, and backend logic. These are not marketing pages — they're software that runs in the browser. Design can deviate completely from the hub.
+      </p>
+      <p class="slide-body" style="margin-top:14px;">
+        These will always exist as their own units within the ecosystem. The hub links to them; they optionally share the Bohemia Account system for login.
+      </p>
+      <div style="margin-top:28px; display:flex; flex-direction:column; gap:10px;">
+        <p style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim);">Current and planned BI Web Apps</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg3); border:1px solid var(--border);">
+            <span style="font-size:18px;">🔧</span>
+            <div>
+              <div style="font-size:13px; font-weight:600; color:#fff;">Arma Reforger Workshop</div>
+              <div style="font-size:11px; color:var(--dim);">reforger.armaplatform.com/workshop → workshop.bohemia.net</div>
+            </div>
+            <span style="margin-left:auto; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--bi-green); border:1px solid rgba(107,165,57,0.4); padding:2px 8px;">Live</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg3); border:1px solid var(--border);">
+            <span style="font-size:18px;">🐛</span>
+            <div>
+              <div style="font-size:13px; font-weight:600; color:#fff;">Feedback Tracker</div>
+              <div style="font-size:11px; color:var(--dim);">ft.bistudio.com → feedback.bohemia.net</div>
+            </div>
+            <span style="margin-left:auto; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--bi-green); border:1px solid rgba(107,165,57,0.4); padding:2px 8px;">Live</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg3); border:1px solid var(--border);">
+            <span style="font-size:18px;">👤</span>
+            <div>
+              <div style="font-size:13px; font-weight:600; color:#fff;">Bohemia Account</div>
+              <div style="font-size:11px; color:var(--dim);">accounts.bistudio.com → account.bohemia.net</div>
+            </div>
+            <span style="margin-left:auto; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#c49020; border:1px solid rgba(196,144,32,0.4); padding:2px 8px;">Rework</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg3); border:1px solid var(--border);">
+            <span style="font-size:18px;">🎮</span>
+            <div>
+              <div style="font-size:13px; font-weight:600; color:#fff;">DayZ 2 Workshop (planned)</div>
+              <div style="font-size:11px; color:var(--dim);">dayz-workshop.bohemia.net</div>
+            </div>
+            <span style="margin-left:auto; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.3); border:1px solid var(--border); padding:2px 8px;">Planned</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 8: LIVE DEMO ═══ -->
+  <div class="slide" id="slide-8">
+    <div class="slide-inner">
+      <div class="slide-tag">Demo</div>
+      <h1 class="slide-title">The Hub<br>in <span class="hl">Action</span></h1>
+      <p class="slide-body" style="max-width:100%;">Same nav skeleton. Completely different brand worlds. Click any tile to open the live prototype page.</p>
+      <div class="demo-tiles">
+        <a class="demo-tile hub" href="index.html" target="_blank">
+          <img src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg" alt="Hub" onerror="this.style.opacity='0'">
+          <div class="demo-tile-label">
+            <div class="name">Bohemia Hub</div>
+            <div class="url">bohemia.net</div>
+          </div>
+        </a>
+        <a class="demo-tile dayz" href="dayz.html" target="_blank">
+          <img src="https://cdn.akamai.steamstatic.com/steam/apps/221100/library_hero.jpg" alt="DayZ" onerror="this.style.opacity='0'">
+          <div class="demo-tile-label">
+            <div class="name">DayZ</div>
+            <div class="url">bohemia.net/games/dayz</div>
+          </div>
+        </a>
+        <a class="demo-tile arma" href="arma.html" target="_blank">
+          <img src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg" alt="Arma" onerror="this.style.opacity='0'">
+          <div class="demo-tile-label">
+            <div class="name">Arma Reforger</div>
+            <div class="url">bohemia.net/games/arma-reforger</div>
+          </div>
+        </a>
+        <a class="demo-tile ef" href="enfusion.html" target="_blank">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#040810,#0a1520,#040608);"></div>
+          <div class="demo-tile-label">
+            <div class="name">Enfusion Engine</div>
+            <div class="url">bohemia.net/technology/enfusion</div>
+          </div>
+        </a>
+      </div>
+      <div style="margin-top:32px; background:var(--bg3); border:1px solid var(--border); padding:24px; display:flex; gap:32px; flex-wrap:wrap;">
+        <div>
+          <p style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--bi-green); margin-bottom:10px;">What to notice</p>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:7px;">
+            <li style="font-size:13px; color:rgba(255,255,255,0.65); display:flex; gap:8px; align-items:baseline;"><span style="color:var(--bi-green); font-size:10px; flex-shrink:0; margin-top:1px;">▶</span>BI logo (top-left) is identical on all 4 pages — always opens the hub switcher dropdown</li>
+            <li style="font-size:13px; color:rgba(255,255,255,0.65); display:flex; gap:8px; align-items:baseline;"><span style="color:var(--bi-green); font-size:10px; flex-shrink:0; margin-top:1px;">▶</span>Everything to the right of the logo is completely brand-specific</li>
+            <li style="font-size:13px; color:rgba(255,255,255,0.65); display:flex; gap:8px; align-items:baseline;"><span style="color:var(--bi-green); font-size:10px; flex-shrink:0; margin-top:1px;">▶</span>DayZ = blood red survival horror / Arma = military gold / Enfusion = electric blue tech</li>
+            <li style="font-size:13px; color:rgba(255,255,255,0.65); display:flex; gap:8px; align-items:baseline;"><span style="color:var(--bi-green); font-size:10px; flex-shrink:0; margin-top:1px;">▶</span>Hub dropdown on all pages shows the full BI ecosystem with one click</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 9: CONCLUSION ═══ -->
+  <div class="slide" id="slide-9">
+    <div class="slide-inner">
+      <div class="slide-tag">Summary</div>
+      <h1 class="slide-title">Why <span class="hl">bohemia.net</span><br>Wins.</h1>
+      <p class="slide-body" style="max-width:100%; margin-bottom:28px;">The hub is not about making everything look the same. It's about building once and unlocking creativity at every level.</p>
+      <div class="conclusion-grid">
+        <div class="conc-card">
+          <div class="cc-icon">🎨</div>
+          <div class="cc-title">Creative Freedom Preserved</div>
+          <p class="cc-text">Presentation websites, landing pages, and microsites each support complete visual independence. DayZ can look nothing like Arma. That's by design.</p>
+        </div>
+        <div class="conc-card">
+          <div class="cc-icon">🔧</div>
+          <div class="cc-title">Dramatically Less Overhead</div>
+          <p class="cc-text">One tech stack. One CMS. One analytics system. One deployment pipeline. 25 websites become one managed ecosystem with clear ownership.</p>
+        </div>
+        <div class="conc-card">
+          <div class="cc-icon">🚀</div>
+          <div class="cc-title">Ready for Arma 4 & DayZ 2</div>
+          <p class="cc-text">New game launches get a landing page on day one, a presentation website in weeks, with no new domain or tech stack to spin up. Ship fast.</p>
+        </div>
+        <div class="conc-card">
+          <div class="cc-icon">📊</div>
+          <div class="cc-title">Unified Analytics</div>
+          <p class="cc-text">Cross-product insights for the first time. See how DayZ players discover Arma. Track the full user journey from first visit to Bohemia Account login.</p>
+        </div>
+        <div class="conc-card">
+          <div class="cc-icon">🔑</div>
+          <div class="cc-title">One Account to Rule All</div>
+          <p class="cc-text">Bohemia Account becomes meaningful: mod subscriptions, wishlist, news preferences — all cross-game, all under one login. Platform thinking.</p>
+        </div>
+        <div class="conc-card">
+          <div class="cc-icon">🌐</div>
+          <div class="cc-title">SEO & Discovery</div>
+          <p class="cc-text">Domain authority accumulates on one domain. Organic search traffic from legacy URLs redirected cleanly. No more split link juice across 15 domains.</p>
+        </div>
+      </div>
+      <div style="margin-top:32px; padding:20px 28px; border:1px solid rgba(107,165,57,0.3); background:rgba(107,165,57,0.05); display:flex; align-items:center; gap:20px;">
+        <div style="font-size:28px; flex-shrink:0;">→</div>
+        <p style="font-size:15px; color:rgba(255,255,255,0.8); line-height:1.55;">
+          <strong style="color:#fff;">Phase 1 proposal:</strong> Consolidate DayZ, Arma Reforger, Arma 3, Enfusion, Incubator under bohemia.net with full redirects. Deliver reworked Careers. Build foundation for Arma 4 and DayZ 2 launches.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Controls -->
+<button class="arrow-btn" id="btn-prev" onclick="changeSlide(-1)" title="Previous (←)">←</button>
+<button class="arrow-btn" id="btn-next" onclick="changeSlide(1)" title="Next (→)">→</button>
+<div class="key-hint">← → arrow keys to navigate &nbsp;·&nbsp; click dots to jump</div>
+
+<script>
+  const SLIDES = [
+    { label: 'Cover' },
+    { label: 'The Problem' },
+    { label: 'The Proposal' },
+    { label: 'Taxonomy' },
+    { label: 'Presentation Website' },
+    { label: 'Landing Page' },
+    { label: 'Microsite' },
+    { label: 'Web Application' },
+    { label: 'Live Demo' },
+    { label: 'Summary' },
+  ];
+
+  let current = 0;
+  const total = SLIDES.length;
+
+  const deck = document.getElementById('deck');
+  const slideEls = deck.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('nav-dots');
+  const labelEl = document.getElementById('nav-slide-label');
+  const counterEl = document.getElementById('slide-counter');
+
+  // Build dots
+  SLIDES.forEach((s, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.title = s.label;
+    dot.onclick = () => goTo(i);
+    dotsEl.appendChild(dot);
+  });
+
+  function updateUI() {
+    dotsEl.querySelectorAll('.nav-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+    labelEl.textContent = SLIDES[current].label;
+    counterEl.textContent = (current + 1) + ' / ' + total;
+  }
+
+  function goTo(n) {
+    if (n === current) return;
+    const prev = current;
+    current = Math.max(0, Math.min(total - 1, n));
+    slideEls[prev].classList.remove('active');
+    slideEls[prev].classList.add('exit');
+    setTimeout(() => slideEls[prev].classList.remove('exit'), 600);
+    slideEls[current].classList.add('active');
+    // Scroll to top of new slide
+    slideEls[current].scrollTop = 0;
+    updateUI();
+  }
+
+  function changeSlide(dir) {
+    goTo(current + dir);
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault(); changeSlide(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault(); changeSlide(-1);
+    }
+  });
+
+  // Touch swipe
+  let touchX = 0;
+  deck.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+  deck.addEventListener('touchend', e => {
+    const dx = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 50) changeSlide(dx > 0 ? 1 : -1);
+  });
+
+  updateUI();
+</script>
+</body>
+</html>

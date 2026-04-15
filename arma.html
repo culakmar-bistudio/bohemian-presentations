@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arma Reforger — bohemia.net</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bi-green: #6ba539;
+      --arma-gold: #c49020;
+      --arma-gold-dark: #a07818;
+      --arma-olive: #4a5a28;
+      --text-primary: #e8e8e0;
+      --text-dim: rgba(232,232,224,0.5);
+      --bg: #0c0e09;
+      --bg-mid: #111409;
+      --bg-card: #151810;
+      --nav-height: 64px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; color: var(--text-primary); background: var(--bg); }
+
+    /* ── NAV — Arma variant (dark + gold CTA) ── */
+    #main-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-height); background: transparent;
+      display: flex; align-items: center; padding: 0 32px; gap: 0;
+      transition: background 0.4s;
+    }
+    #main-nav.scrolled { background: rgba(12,14,9,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+    .nav-hub-switcher { position: relative; display: flex; align-items: center; margin-right: 24px; }
+    .nav-hub-btn { display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; font-family: 'Barlow', sans-serif; color: rgba(255,255,255,0.7); padding: 4px 0; }
+    .nav-hub-btn .bi-logo { width: 28px; height: 31px; flex-shrink: 0; }
+    .nav-hub-btn .chevron { font-size: 9px; color: rgba(255,255,255,0.4); }
+    .nav-hub-btn:hover .chevron { color: rgba(255,255,255,0.7); }
+
+    .nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.18); margin: 0 20px; }
+
+    /* Arma wordmark */
+    .nav-game-logo { margin-right: auto; display: flex; align-items: center; gap: 10px; }
+    .arma-wordmark { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 0.12em; color: #fff; text-transform: uppercase; text-decoration: none; line-height: 1; }
+    .arma-wordmark span { display: block; font-size: 9px; font-weight: 600; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); }
+    .arma-diamond { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .nav-links { display: flex; align-items: center; gap: 22px; margin: 0 auto; }
+    .nav-links a { font-size: 12px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-account { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.45); text-decoration: none; }
+    .nav-account svg { width: 15px; height: 15px; }
+    .btn-cta-arma { font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; background: var(--arma-gold); color: #fff; border: none; padding: 10px 20px; cursor: pointer; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
+    .btn-cta-arma:hover { background: var(--arma-gold-dark); }
+
+    /* Hub dropdown (dark variant) */
+    .hub-dropdown { display: none; position: absolute; top: calc(100% + 12px); left: -16px; background: #1a1c14; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 48px rgba(0,0,0,0.65); padding: 20px; width: 300px; z-index: 200; }
+    .hub-dropdown.open { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+    .hub-dropdown-section h4 { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 8px; }
+    .hub-dropdown-section a { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.15s; }
+    .hub-dropdown-section a:hover { color: var(--bi-green); }
+    .hub-dropdown-section a .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.18); flex-shrink: 0; }
+    .hub-dropdown-dev { grid-column: 1/-1; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 4px; }
+
+    /* ── HERO ── */
+    .hero { height: 100vh; min-height: 640px; position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+    .hero-bg { position: absolute; inset: 0; background: url('https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg') center 25% / cover no-repeat; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(12,14,9,1) 0%, rgba(12,14,9,0.6) 45%, rgba(12,14,9,0.15) 100%); }
+    .hero-overlay-side { position: absolute; inset: 0; background: linear-gradient(to right, rgba(12,14,9,0.75) 0%, rgba(12,14,9,0) 55%); }
+    .hero-content { position: relative; z-index: 1; padding: 0 64px 80px; max-width: 680px; }
+    .hero-label { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--arma-gold); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+    .hero-label::before { content: ''; display: inline-block; width: 28px; height: 1px; background: var(--arma-gold); }
+    .hero-headline { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(56px, 8.5vw, 106px); font-weight: 900; line-height: 0.88; color: #fff; text-transform: uppercase; letter-spacing: 0; margin-bottom: 28px; }
+    .hero-headline .highlight { color: var(--arma-gold); }
+    .hero-sub { font-size: 15px; font-weight: 400; color: var(--text-dim); line-height: 1.7; margin-bottom: 40px; max-width: 460px; }
+    .hero-actions { display: flex; gap: 12px; }
+    .btn-arma-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--arma-gold); color: #fff; font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 14px 28px; transition: background 0.2s; }
+    .btn-arma-primary:hover { background: var(--arma-gold-dark); }
+    .btn-arma-outline { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.28); color: rgba(255,255,255,0.7); font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 14px 28px; transition: all 0.2s; }
+    .btn-arma-outline:hover { border-color: rgba(255,255,255,0.65); color: #fff; }
+
+    /* ── FEATURES STRIP ── */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg-mid); }
+    .feature-block { padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.07); }
+    .feature-block:last-child { border-right: none; }
+    .feature-number { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; color: rgba(196,144,32,0.2); line-height: 1; margin-bottom: 16px; }
+    .feature-title { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--arma-gold); margin-bottom: 12px; }
+    .feature-text { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+    /* ── FEATURED ANNOUNCEMENT ── */
+    .featured { display: grid; grid-template-columns: 1fr 1fr; min-height: 480px; }
+    .featured-content { background: var(--bg-mid); display: flex; flex-direction: column; justify-content: center; padding: 64px 56px; }
+    .featured-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--arma-gold); margin-bottom: 16px; }
+    .featured-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(32px, 3.5vw, 48px); font-weight: 900; text-transform: uppercase; color: #fff; line-height: 1.0; margin-bottom: 20px; }
+    .featured-text { font-size: 14px; color: var(--text-dim); line-height: 1.75; margin-bottom: 32px; max-width: 400px; }
+    .featured-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; text-transform: uppercase; }
+    .featured-img { position: relative; overflow: hidden; }
+    .featured-img img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.75) saturate(0.85); }
+
+    /* ── NEWS ── */
+    .section { padding: 72px 64px; }
+    .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; }
+    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #fff; }
+    .section-link { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.35); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .section-link:hover { color: rgba(255,255,255,0.7); }
+    .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .news-card { display: block; text-decoration: none; color: inherit; background: var(--bg-card); }
+    .news-card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; filter: brightness(0.8) saturate(0.7); transition: filter 0.4s; }
+    .news-card:hover .news-card-img { filter: brightness(0.95) saturate(0.85); }
+    .news-card-body { padding: 20px; }
+    .news-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .news-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 7px; background: rgba(196,144,32,0.15); color: var(--arma-gold); }
+    .news-date { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; }
+    .news-card-title { font-size: 15px; font-weight: 700; line-height: 1.35; color: var(--text-primary); }
+    .news-card:hover .news-card-title { color: #fff; }
+
+    /* ── ROAD TO ARMA 4 ── */
+    .road-to { background: linear-gradient(135deg, #0e1108 0%, #161c0a 50%, #0c0e09 100%); padding: 72px 64px; border-top: 1px solid rgba(196,144,32,0.2); }
+    .road-to-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .road-to h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(36px, 4vw, 54px); font-weight: 900; text-transform: uppercase; color: #fff; line-height: 1.0; margin-bottom: 20px; }
+    .road-to h2 span { color: var(--arma-gold); }
+    .road-to p { font-size: 14px; color: var(--text-dim); line-height: 1.75; margin-bottom: 28px; }
+    .road-to-steps { display: flex; flex-direction: column; gap: 0; }
+    .road-step { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .road-step:first-child { border-top: 1px solid rgba(255,255,255,0.07); }
+    .road-step-num { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; color: rgba(196,144,32,0.3); line-height: 1; flex-shrink: 0; width: 36px; }
+    .road-step-text h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; margin-bottom: 4px; }
+    .road-step-text p { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer { background: #0a0b07; color: rgba(255,255,255,0.4); padding: 48px 64px; display: grid; grid-template-columns: 1fr 3fr; gap: 48px; }
+    .footer-brand .bi-name { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+    .footer-brand .game-name { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.06em; }
+    .footer-brand p { font-size: 12px; line-height: 1.65; }
+    .footer-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+    .footer-col h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+    .footer-col a { display: block; font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: none; padding: 3px 0; transition: color 0.15s; }
+    .footer-col a:hover { color: rgba(255,255,255,0.7); }
+    .footer-bottom { background: var(--bg); padding: 14px 64px; display: flex; justify-content: space-between; }
+    .footer-bottom span, .footer-bottom a { font-size: 11px; color: rgba(255,255,255,0.2); text-decoration: none; }
+    .footer-bottom div { display: flex; gap: 20px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAV — Arma Reforger variant
+════════════════════════════════════════ -->
+<nav id="main-nav">
+  <div class="nav-hub-switcher">
+    <button class="nav-hub-btn" id="hub-btn" onclick="toggleHub(this)" aria-expanded="false">
+      <svg class="bi-logo" viewBox="0 0 61 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M36.5263 1.59133C36.251 2.4754 35.3267 5.34373 34.4614 7.96648L32.8882 12.7405L31.1478 12.7994C23.4389 13.0843 15.9956 16.4438 9.10282 22.7698C6.80196 24.8817 4.75675 27.5045 3.25234 30.2746L2.78037 31.139H4.4421H6.10383L6.96911 29.7343C9.06349 26.3061 11.1382 24.0271 14.3535 21.6107C18.7389 18.3101 23.7733 16.1392 28.5815 15.4713C29.7614 15.3141 32.0033 15.1668 32.0033 15.2552C32.0033 15.373 30.7643 18.8406 28.021 26.424C26.5166 30.5595 25.2285 34.1252 25.1498 34.3511L25.0023 34.7735H20.4498H15.8972L13.9012 37.5927C12.7999 39.1448 11.8855 40.4414 11.8658 40.4905C11.8461 40.5298 12.0231 40.5004 12.2591 40.412C13.3702 40.019 16.8903 39.2528 19.5648 38.8108C21.3249 38.5161 23.6553 38.192 23.6946 38.2312C23.7143 38.2509 22.3573 42.0524 20.6661 46.6889L17.6081 55.1072H16.1234C13.0261 55.1072 10.4302 54.5178 7.98188 53.2703C5.90718 52.2094 4.30444 50.7949 3.03602 48.9089C2.31823 47.8382 1.94458 47.0622 1.57094 45.8539C1.32512 45.0681 1.25629 44.96 0.676162 44.3903C0.322183 44.0563 0.0272013 43.8009 0.00753588 43.8206C-0.0121296 43.8402 0.00753588 44.1938 0.0566996 44.5966C0.322183 46.9934 1.0793 49.1545 2.32806 51.0307C3.09502 52.1996 4.9829 54.0562 6.21199 54.8518C8.93566 56.6298 12.4558 57.6612 15.8087 57.6612C16.2807 57.6612 16.6642 57.671 16.6642 57.6907C16.6642 57.7103 16.0644 59.3606 15.3368 61.3547C14.6091 63.3487 14.0094 64.9892 14.0094 64.999C14.0094 65.0187 14.4027 64.7436 14.8746 64.39L15.7399 63.7613L16.9592 60.7063C17.9523 58.2015 18.2079 57.6514 18.3751 57.6219C18.4931 57.5924 19.024 57.5335 19.5648 57.4647C24.7074 56.9048 30.666 54.4 35.4054 50.8244C40.1743 47.2291 44.186 42.3667 46.2214 37.7106L46.6934 36.6399H53.1928H59.6922L60.351 35.7067L61 34.7735H54.2252C50.0955 34.7735 47.4407 34.7342 47.4407 34.6851C47.4407 34.636 47.5685 34.0859 47.7258 33.4769C48.2863 31.306 48.3748 30.5889 48.3649 28.143C48.3649 26.1686 48.3453 25.756 48.1486 24.8817C47.5193 21.9938 46.3099 19.6461 44.4613 17.7208C43.3699 16.5813 42.603 15.9624 41.305 15.1864C39.4367 14.0861 37.9716 13.6441 35.7297 13.4083L34.5994 13.2904L35.867 9.48156C36.5656 7.38718 37.4407 4.76443 37.8044 3.64184L38.4829 1.59133H37.5094H36.5263Z" fill="white"/>
+        <path d="M36.5165 15.8249C39.5548 16.6206 42.2981 18.4869 43.8517 20.8248C44.4515 21.7187 45.2086 23.3493 45.4643 24.2629C46.2509 27.1214 46.1132 30.4416 45.071 33.8109L44.776 34.7735H36.0248C27.7162 34.7735 27.2639 34.7637 27.3229 34.5967C27.3622 34.5083 29.0829 30.1764 31.1478 24.9701L34.9039 15.5106L35.3366 15.5695C35.5725 15.6088 36.1035 15.7169 36.5165 15.8249Z" fill="white"/>
+        <path d="M43.9009 36.8658C43.9009 36.9248 43.5862 37.5633 43.2027 38.2607C40.6561 42.9365 36.9983 46.8755 32.2982 49.9894C29.7614 51.6692 27.3917 52.8283 24.6287 53.732C22.6917 54.3705 19.5353 55.0581 19.3584 54.8813C19.2994 54.8223 25.8578 38.1527 26.0053 37.9857C26.1921 37.7696 34.9531 37.0918 40.7052 36.8462C43.5764 36.7185 43.9009 36.7185 43.9009 36.8658Z" fill="white"/>
+      </svg>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="hub-dropdown" id="hub-dropdown">
+      <div class="hub-dropdown-section">
+        <h4>Games</h4>
+        <a href="arma.html" style="color:#fff;"><span class="dot" style="background:var(--arma-gold)"></span> Arma Reforger</a>
+        <a href="dayz.html"><span class="dot"></span> DayZ</a>
+        <a href="#"><span class="dot"></span> Arma 3</a>
+        <a href="index.html"><span class="dot"></span> All games →</a>
+      </div>
+      <div class="hub-dropdown-section">
+        <h4>Hub</h4>
+        <a href="index.html"><span class="dot"></span> Home</a>
+        <a href="#"><span class="dot"></span> Store</a>
+        <a href="https://careers.bohemia.net" target="_blank"><span class="dot"></span> Careers</a>
+        <a href="#"><span class="dot"></span> Community</a>
+        <a href="#"><span class="dot"></span> Forums</a>
+      </div>
+      <div class="hub-dropdown-section hub-dropdown-dev">
+        <h4>Development</h4>
+        <a href="enfusion.html"><span class="dot"></span> Enfusion Engine</a>
+        <a href="#"><span class="dot"></span> Incubator</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-divider"></div>
+  <div class="nav-game-logo">
+    <!-- Arma diamond icon -->
+    <svg class="arma-diamond" viewBox="0 0 20 20" fill="none">
+      <polygon points="10,0 20,10 10,20 0,10" fill="none" stroke="white" stroke-width="1.5"/>
+      <polygon points="10,4 16,10 10,16 4,10" fill="white" opacity="0.35"/>
+    </svg>
+    <a href="arma.html" class="arma-wordmark">Arma<span>Reforger</span></a>
+  </div>
+
+  <nav class="nav-links">
+    <a href="#" class="active">Game</a>
+    <a href="#">Roadmap</a>
+    <a href="#">Dev Hub</a>
+    <a href="#">FAQ</a>
+    <a href="#">News</a>
+    <a href="#">Media</a>
+    <a href="#">Store</a>
+    <a href="#">Workshop</a>
+  </nav>
+
+  <div class="nav-right">
+    <a href="#" class="nav-account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Account
+    </a>
+    <a href="#" class="btn-cta-arma">Play Arma Reforger Now</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-overlay-side"></div>
+  <div class="hero-content">
+    <p class="hero-label">Arma Reforger — Military Simulation</p>
+    <h1 class="hero-headline">
+      CHOICE<br>
+      IS<br>
+      <span class="highlight">YOURS</span>
+    </h1>
+    <p class="hero-sub">Return to Everon. Four years have passed since rogue Soviet forces invaded — now shape the conflict your way. Create, command, and conquer in the most authentic military simulation available.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-arma-primary">Play Now</a>
+      <a href="#news" class="btn-arma-outline">Latest Updates</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FEATURES
+════════════════════════════════════════ -->
+<div class="features">
+  <div class="feature-block">
+    <div class="feature-number">01</div>
+    <p class="feature-title">Multiplatform</p>
+    <p class="feature-text">Experience authentic combat on PC, Xbox, and PlayStation. Cross-play brings the full Arma community together on a single battlefield.</p>
+  </div>
+  <div class="feature-block">
+    <div class="feature-number">02</div>
+    <p class="feature-title">Multiplayer</p>
+    <p class="feature-text">Dive into Conflict mode or shape your own battle in Game Master. Coordinate with dozens of players across a living, evolving Everon.</p>
+  </div>
+  <div class="feature-block">
+    <div class="feature-number">03</div>
+    <p class="feature-title">Workshop</p>
+    <p class="feature-text">A versatile platform for player-built missions, mods, and scenarios — powered by the all-new Enfusion engine with full modding support.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FEATURED: Kolguyev Reveal
+════════════════════════════════════════ -->
+<div class="featured">
+  <div class="featured-content">
+    <p class="featured-eyebrow">New Map — 2026</p>
+    <h2 class="featured-title">Kolguyev<br>Island</h2>
+    <p class="featured-text">A new theatre of operations awaits. Kolguyev Island brings rugged arctic terrain, expanded vehicle rosters, and new strategic opportunities to Arma Reforger — shipping in 2026.</p>
+    <div class="featured-meta">
+      <span>Coming 2026</span><span>·</span><span>PC &amp; Console</span><span>·</span><span>Free Update</span>
+    </div>
+    <a href="#" class="btn-arma-primary">Learn More →</a>
+  </div>
+  <div class="featured-img">
+    <img src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/ss_4cace85.1920x1080.jpg" alt="Kolguyev Island" loading="lazy" onerror="this.src='https://cdn.akamai.steamstatic.com/steam/apps/1874880/header.jpg'">
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     NEWS
+════════════════════════════════════════ -->
+<section class="section" id="news">
+  <div class="section-header">
+    <h2 class="section-title">Latest News</h2>
+    <a href="#" class="section-link">All posts →</a>
+  </div>
+  <div class="news-grid">
+    <a href="#" class="news-card">
+      <img class="news-card-img" src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/ss_6e42c.1920x1080.jpg" alt="Update" loading="lazy" onerror="this.src='https://cdn.akamai.steamstatic.com/steam/apps/1874880/header.jpg'">
+      <div class="news-card-body">
+        <div class="news-card-meta"><span class="news-tag">Development</span><span class="news-date">Apr 5, 2026</span></div>
+        <h3 class="news-card-title">Arma Reforger 1.3 Experimental Update</h3>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <img class="news-card-img" src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/ss_a55cd.1920x1080.jpg" alt="Community" loading="lazy" onerror="this.src='https://cdn.akamai.steamstatic.com/steam/apps/1874880/header.jpg'">
+      <div class="news-card-body">
+        <div class="news-card-meta"><span class="news-tag">Community</span><span class="news-date">Mar 26, 2026</span></div>
+        <h3 class="news-card-title">PlayStation Mods — Workshop Now on Console</h3>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <img class="news-card-img" src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/header.jpg" alt="MANW" loading="lazy">
+      <div class="news-card-body">
+        <div class="news-card-meta"><span class="news-tag">Contest</span><span class="news-date">Mar 10, 2026</span></div>
+        <h3 class="news-card-title">Make Arma Not War 2025 — Winners Announced</h3>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     ROAD TO ARMA 4
+════════════════════════════════════════ -->
+<div class="road-to">
+  <div class="road-to-inner">
+    <div>
+      <h2>Road to<br><span>Arma 4</span></h2>
+      <p>Arma Reforger is the first milestone on the long road to Arma 4. Every feature, every improvement, every mod published on the Workshop is a step toward the future of military simulation.</p>
+      <a href="#" class="btn-arma-primary">Learn About Arma 4 →</a>
+    </div>
+    <div class="road-to-steps">
+      <div class="road-step">
+        <div class="road-step-num">01</div>
+        <div class="road-step-text">
+          <h4>Enfusion Engine</h4>
+          <p>Built on the all-new Enfusion engine — fully scriptable, moddable, and designed from the ground up for Arma 4.</p>
+        </div>
+      </div>
+      <div class="road-step">
+        <div class="road-step-num">02</div>
+        <div class="road-step-text">
+          <h4>Workshop Foundation</h4>
+          <p>The modding tools you use in Arma Reforger today are the tools that will define Arma 4's community creation platform.</p>
+        </div>
+      </div>
+      <div class="road-step">
+        <div class="road-step-num">03</div>
+        <div class="road-step-text">
+          <h4>Cross-Platform Play</h4>
+          <p>PC, Xbox, and PlayStation — establishing the cross-platform foundation for the next generation of Arma.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">
+    <div class="bi-name">Bohemia Interactive</div>
+    <div class="game-name">Arma Reforger</div>
+    <p>Military simulation on PC, Xbox, and PlayStation. The road to Arma 4.</p>
+  </div>
+  <div class="footer-links">
+    <div class="footer-col">
+      <h4>Game</h4>
+      <a href="#">About</a><a href="#">Buy Now</a><a href="#">Roadmap</a><a href="#">System Req.</a>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <a href="#">Forums</a><a href="#">Discord</a><a href="#">Workshop</a><a href="#">Feedback</a>
+    </div>
+    <div class="footer-col">
+      <h4>Creators</h4>
+      <a href="#">Dev Hub</a><a href="#">Documentation</a><a href="#">MANW Contest</a>
+    </div>
+    <div class="footer-col">
+      <h4>Media</h4>
+      <a href="#">Screenshots</a><a href="#">Videos</a><a href="#">Press Kit</a>
+    </div>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2026 Bohemia Interactive a.s. — <a href="index.html">bohemia.net</a></span>
+  <div><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+</div>
+
+<script>
+  function toggleHub(btn) {
+    const dropdown = document.getElementById('hub-dropdown');
+    const isOpen = dropdown.classList.contains('open');
+    dropdown.classList.toggle('open');
+    btn.setAttribute('aria-expanded', !isOpen);
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('hub-btn').contains(e.target)) {
+      document.getElementById('hub-dropdown').classList.remove('open');
+      document.getElementById('hub-btn').setAttribute('aria-expanded', 'false');
+    }
+  });
+  window.addEventListener('scroll', function() {
+    document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 30);
+  }, { passive: true });
+</script>
+</body>
+</html>

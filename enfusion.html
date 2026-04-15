@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enfusion Engine — bohemia.net</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bi-green: #6ba539;
+      --ef-blue: #00A3E0;
+      --ef-blue-dark: #007eb0;
+      --ef-blue-dim: rgba(0,163,224,0.12);
+      --text-primary: #fff;
+      --text-dim: rgba(255,255,255,0.5);
+      --bg: #040608;
+      --bg-mid: #070a0e;
+      --bg-card: #0b0f14;
+      --border: rgba(0,163,224,0.15);
+      --nav-height: 64px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; color: var(--text-primary); background: var(--bg); }
+
+    /* ── NAV — Enfusion variant (dark + blue CTA) ── */
+    #main-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-height); background: transparent;
+      display: flex; align-items: center; padding: 0 32px; gap: 0;
+      transition: background 0.4s;
+    }
+    #main-nav.scrolled { background: rgba(4,6,8,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,163,224,0.12); }
+
+    .nav-hub-switcher { position: relative; display: flex; align-items: center; margin-right: 24px; }
+    .nav-hub-btn { display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; font-family: 'Barlow', sans-serif; color: rgba(255,255,255,0.6); padding: 4px 0; }
+    .nav-hub-btn .bi-logo { width: 28px; height: 31px; flex-shrink: 0; }
+    .nav-hub-btn .chevron { font-size: 9px; color: rgba(255,255,255,0.35); }
+    .nav-hub-btn:hover .chevron { color: rgba(255,255,255,0.7); }
+
+    .nav-divider { width: 1px; height: 20px; background: rgba(0,163,224,0.3); margin: 0 20px; }
+
+    .nav-game-logo { margin-right: auto; }
+    .enfusion-wordmark { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 0.14em; color: #fff; text-transform: uppercase; text-decoration: none; }
+    .enfusion-wordmark span { color: var(--ef-blue); }
+
+    .nav-links { display: flex; align-items: center; gap: 24px; margin: 0 auto; }
+    .nav-links a { font-size: 12px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: var(--ef-blue); }
+
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-account { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.4); text-decoration: none; }
+    .nav-account svg { width: 15px; height: 15px; }
+    .btn-cta-ef { font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--ef-blue); color: #fff; border: none; padding: 10px 22px; cursor: pointer; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
+    .btn-cta-ef:hover { background: var(--ef-blue-dark); }
+
+    /* Hub dropdown */
+    .hub-dropdown { display: none; position: absolute; top: calc(100% + 12px); left: -16px; background: #0d1017; border: 1px solid rgba(0,163,224,0.15); box-shadow: 0 12px 48px rgba(0,0,0,0.7); padding: 20px; width: 300px; z-index: 200; }
+    .hub-dropdown.open { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+    .hub-dropdown-section h4 { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: rgba(255,255,255,0.28); text-transform: uppercase; margin-bottom: 8px; }
+    .hub-dropdown-section a { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.15s; }
+    .hub-dropdown-section a:hover { color: var(--ef-blue); }
+    .hub-dropdown-section a .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+    .hub-dropdown-dev { grid-column: 1/-1; padding-top: 12px; border-top: 1px solid rgba(0,163,224,0.1); margin-top: 4px; }
+
+    /* ── HERO ── */
+    .hero {
+      height: 100vh; min-height: 640px; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: flex-start;
+    }
+    /* Animated grid background */
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,163,224,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,163,224,0.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: grid-move 20s linear infinite;
+    }
+    @keyframes grid-move { from { background-position: 0 0; } to { background-position: 60px 60px; } }
+    .hero-glow { position: absolute; top: 20%; left: 30%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,163,224,0.12) 0%, transparent 70%); pointer-events: none; animation: pulse 4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+    .hero-content { position: relative; z-index: 1; padding: 0 64px; max-width: 700px; }
+    .hero-label { font-size: 10px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ef-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+    .hero-label::before { content: ''; display: inline-block; width: 28px; height: 1px; background: var(--ef-blue); }
+    .hero-headline { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(48px, 7vw, 88px); font-weight: 900; line-height: 0.92; color: #fff; text-transform: uppercase; letter-spacing: -0.01em; margin-bottom: 28px; }
+    .hero-headline .highlight { color: var(--ef-blue); display: inline; }
+    .hero-sub { font-size: 15px; font-weight: 400; color: var(--text-dim); line-height: 1.72; margin-bottom: 40px; max-width: 500px; }
+    .hero-actions { display: flex; gap: 12px; }
+    .btn-ef-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--ef-blue); color: #fff; font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 14px 28px; transition: background 0.2s; }
+    .btn-ef-primary:hover { background: var(--ef-blue-dark); }
+    .btn-ef-outline { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(0,163,224,0.4); color: rgba(255,255,255,0.65); font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 14px 28px; transition: all 0.2s; }
+    .btn-ef-outline:hover { border-color: var(--ef-blue); color: #fff; }
+    /* Metrics strip on hero right */
+    .hero-metrics { position: absolute; right: 64px; top: 50%; transform: translateY(-50%); z-index: 1; display: flex; flex-direction: column; gap: 28px; align-items: flex-end; }
+    .metric { text-align: right; }
+    .metric-value { font-family: 'Barlow Condensed', sans-serif; font-size: 44px; font-weight: 900; color: var(--ef-blue); line-height: 1; }
+    .metric-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 4px; }
+    .metric-divider { width: 40px; height: 1px; background: rgba(0,163,224,0.2); margin-left: auto; }
+
+    /* ── PILLARS ── */
+    .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(0,163,224,0.08); }
+    .pillar-block { background: var(--bg-mid); padding: 48px 40px; position: relative; overflow: hidden; }
+    .pillar-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, var(--ef-blue), transparent); opacity: 0; transition: opacity 0.3s; }
+    .pillar-block:hover::before { opacity: 1; }
+    .pillar-icon { width: 40px; height: 40px; margin-bottom: 20px; }
+    .pillar-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 12px; }
+    .pillar-text { font-size: 13px; color: var(--text-dim); line-height: 1.72; }
+    .pillar-tag { display: inline-block; margin-top: 16px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ef-blue); padding: 3px 8px; background: var(--ef-blue-dim); }
+
+    /* ── GAMES BUILT ON ENFUSION ── */
+    .section { padding: 72px 64px; }
+    .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 40px; }
+    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #fff; }
+    .section-subtitle { font-size: 13px; color: var(--text-dim); }
+    .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+    .game-card { position: relative; overflow: hidden; aspect-ratio: 21/9; display: block; text-decoration: none; }
+    .game-card img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.6) saturate(0.7); transition: filter 0.4s, transform 0.6s; }
+    .game-card:hover img { filter: brightness(0.75) saturate(0.85); transform: scale(1.04); }
+    .game-card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(4,6,8,0.9) 0%, rgba(4,6,8,0.2) 60%, transparent 100%); }
+    .game-card-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 28px; }
+    .game-card-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ef-blue); margin-bottom: 6px; }
+    .game-card-name { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; text-transform: uppercase; color: #fff; }
+
+    /* ── TECH DETAILS ── */
+    .tech-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: rgba(0,163,224,0.08); }
+    .tech-item { background: var(--bg-card); padding: 36px 40px; display: flex; gap: 24px; align-items: flex-start; }
+    .tech-item-num { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; color: rgba(0,163,224,0.2); line-height: 1; flex-shrink: 0; width: 48px; }
+    .tech-item-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; margin-bottom: 8px; }
+    .tech-item-text { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+
+    /* ── CTA ── */
+    .cta-block { background: linear-gradient(135deg, #050d18 0%, #071220 50%, #040608 100%); border-top: 1px solid rgba(0,163,224,0.15); border-bottom: 1px solid rgba(0,163,224,0.15); padding: 72px 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .cta-block h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(36px, 4vw, 52px); font-weight: 900; text-transform: uppercase; color: #fff; line-height: 1.0; margin-bottom: 16px; }
+    .cta-block h2 span { color: var(--ef-blue); }
+    .cta-block p { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 32px; }
+    .cta-actions { display: flex; gap: 12px; }
+
+    /* ── FOOTER ── */
+    footer { background: #040507; color: rgba(255,255,255,0.35); padding: 48px 64px; display: grid; grid-template-columns: 1fr 3fr; gap: 48px; }
+    .footer-brand .bi-name { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.65); margin-bottom: 8px; }
+    .footer-brand .game-name { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--ef-blue); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+    .footer-brand p { font-size: 12px; line-height: 1.65; }
+    .footer-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+    .footer-col h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); margin-bottom: 10px; }
+    .footer-col a { display: block; font-size: 12px; color: rgba(255,255,255,0.28); text-decoration: none; padding: 3px 0; transition: color 0.15s; }
+    .footer-col a:hover { color: var(--ef-blue); }
+    .footer-bottom { background: var(--bg); padding: 14px 64px; display: flex; justify-content: space-between; }
+    .footer-bottom span, .footer-bottom a { font-size: 11px; color: rgba(255,255,255,0.18); text-decoration: none; }
+    .footer-bottom div { display: flex; gap: 20px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAV — Enfusion variant
+════════════════════════════════════════ -->
+<nav id="main-nav">
+  <div class="nav-hub-switcher">
+    <button class="nav-hub-btn" id="hub-btn" onclick="toggleHub(this)" aria-expanded="false">
+      <svg class="bi-logo" viewBox="0 0 61 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M36.5263 1.59133C36.251 2.4754 35.3267 5.34373 34.4614 7.96648L32.8882 12.7405L31.1478 12.7994C23.4389 13.0843 15.9956 16.4438 9.10282 22.7698C6.80196 24.8817 4.75675 27.5045 3.25234 30.2746L2.78037 31.139H4.4421H6.10383L6.96911 29.7343C9.06349 26.3061 11.1382 24.0271 14.3535 21.6107C18.7389 18.3101 23.7733 16.1392 28.5815 15.4713C29.7614 15.3141 32.0033 15.1668 32.0033 15.2552C32.0033 15.373 30.7643 18.8406 28.021 26.424C26.5166 30.5595 25.2285 34.1252 25.1498 34.3511L25.0023 34.7735H20.4498H15.8972L13.9012 37.5927C12.7999 39.1448 11.8855 40.4414 11.8658 40.4905C11.8461 40.5298 12.0231 40.5004 12.2591 40.412C13.3702 40.019 16.8903 39.2528 19.5648 38.8108C21.3249 38.5161 23.6553 38.192 23.6946 38.2312C23.7143 38.2509 22.3573 42.0524 20.6661 46.6889L17.6081 55.1072H16.1234C13.0261 55.1072 10.4302 54.5178 7.98188 53.2703C5.90718 52.2094 4.30444 50.7949 3.03602 48.9089C2.31823 47.8382 1.94458 47.0622 1.57094 45.8539C1.32512 45.0681 1.25629 44.96 0.676162 44.3903C0.322183 44.0563 0.0272013 43.8009 0.00753588 43.8206C-0.0121296 43.8402 0.00753588 44.1938 0.0566996 44.5966C0.322183 46.9934 1.0793 49.1545 2.32806 51.0307C3.09502 52.1996 4.9829 54.0562 6.21199 54.8518C8.93566 56.6298 12.4558 57.6612 15.8087 57.6612C16.2807 57.6612 16.6642 57.671 16.6642 57.6907C16.6642 57.7103 16.0644 59.3606 15.3368 61.3547C14.6091 63.3487 14.0094 64.9892 14.0094 64.999C14.0094 65.0187 14.4027 64.7436 14.8746 64.39L15.7399 63.7613L16.9592 60.7063C17.9523 58.2015 18.2079 57.6514 18.3751 57.6219C18.4931 57.5924 19.024 57.5335 19.5648 57.4647C24.7074 56.9048 30.666 54.4 35.4054 50.8244C40.1743 47.2291 44.186 42.3667 46.2214 37.7106L46.6934 36.6399H53.1928H59.6922L60.351 35.7067L61 34.7735H54.2252C50.0955 34.7735 47.4407 34.7342 47.4407 34.6851C47.4407 34.636 47.5685 34.0859 47.7258 33.4769C48.2863 31.306 48.3748 30.5889 48.3649 28.143C48.3649 26.1686 48.3453 25.756 48.1486 24.8817C47.5193 21.9938 46.3099 19.6461 44.4613 17.7208C43.3699 16.5813 42.603 15.9624 41.305 15.1864C39.4367 14.0861 37.9716 13.6441 35.7297 13.4083L34.5994 13.2904L35.867 9.48156C36.5656 7.38718 37.4407 4.76443 37.8044 3.64184L38.4829 1.59133H37.5094H36.5263Z" fill="white"/>
+        <path d="M36.5165 15.8249C39.5548 16.6206 42.2981 18.4869 43.8517 20.8248C44.4515 21.7187 45.2086 23.3493 45.4643 24.2629C46.2509 27.1214 46.1132 30.4416 45.071 33.8109L44.776 34.7735H36.0248C27.7162 34.7735 27.2639 34.7637 27.3229 34.5967C27.3622 34.5083 29.0829 30.1764 31.1478 24.9701L34.9039 15.5106L35.3366 15.5695C35.5725 15.6088 36.1035 15.7169 36.5165 15.8249Z" fill="white"/>
+        <path d="M43.9009 36.8658C43.9009 36.9248 43.5862 37.5633 43.2027 38.2607C40.6561 42.9365 36.9983 46.8755 32.2982 49.9894C29.7614 51.6692 27.3917 52.8283 24.6287 53.732C22.6917 54.3705 19.5353 55.0581 19.3584 54.8813C19.2994 54.8223 25.8578 38.1527 26.0053 37.9857C26.1921 37.7696 34.9531 37.0918 40.7052 36.8462C43.5764 36.7185 43.9009 36.7185 43.9009 36.8658Z" fill="white"/>
+      </svg>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="hub-dropdown" id="hub-dropdown">
+      <div class="hub-dropdown-section">
+        <h4>Games</h4>
+        <a href="arma.html"><span class="dot"></span> Arma Reforger</a>
+        <a href="dayz.html"><span class="dot"></span> DayZ</a>
+        <a href="#"><span class="dot"></span> Arma 3</a>
+        <a href="index.html"><span class="dot"></span> All games →</a>
+      </div>
+      <div class="hub-dropdown-section">
+        <h4>Hub</h4>
+        <a href="index.html"><span class="dot"></span> Home</a>
+        <a href="#"><span class="dot"></span> Store</a>
+        <a href="https://careers.bohemia.net" target="_blank"><span class="dot"></span> Careers</a>
+        <a href="#"><span class="dot"></span> Community</a>
+        <a href="#"><span class="dot"></span> Forums</a>
+      </div>
+      <div class="hub-dropdown-section hub-dropdown-dev">
+        <h4>Development</h4>
+        <a href="enfusion.html" style="color:var(--ef-blue)"><span class="dot" style="background:var(--ef-blue)"></span> Enfusion Engine</a>
+        <a href="#"><span class="dot"></span> Incubator</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-divider"></div>
+  <div class="nav-game-logo">
+    <a href="enfusion.html" class="enfusion-wordmark">ENFU<span>SION</span></a>
+  </div>
+
+  <nav class="nav-links">
+    <a href="#" class="active">Engine</a>
+    <a href="#features">Features</a>
+    <a href="#">Documentation</a>
+    <a href="#games">Games</a>
+    <a href="#">Showcase</a>
+  </nav>
+
+  <div class="nav-right">
+    <a href="#" class="nav-account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Account
+    </a>
+    <a href="#" class="btn-cta-ef">Explore Enfusion</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <p class="hero-label">Bohemia Interactive — Engine Technology</p>
+    <h1 class="hero-headline">
+      POWERING<br>
+      THE NEXT<br>
+      <span class="highlight">GENERATION</span>
+    </h1>
+    <p class="hero-sub">The Enfusion engine is Bohemia Interactive's proprietary technology platform — built from the ground up to power immersive, moddable, large-scale military simulations. The engine behind Arma Reforger, and the foundation of Arma 4.</p>
+    <div class="hero-actions">
+      <a href="#features" class="btn-ef-primary">Explore Features</a>
+      <a href="#" class="btn-ef-outline">Documentation →</a>
+    </div>
+  </div>
+  <div class="hero-metrics">
+    <div class="metric">
+      <div class="metric-value">100+</div>
+      <div class="metric-label">Km² Terrain</div>
+    </div>
+    <div class="metric-divider"></div>
+    <div class="metric">
+      <div class="metric-value">128</div>
+      <div class="metric-label">Players / Server</div>
+    </div>
+    <div class="metric-divider"></div>
+    <div class="metric">
+      <div class="metric-value">60fps</div>
+      <div class="metric-label">Console Target</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     PILLARS
+════════════════════════════════════════ -->
+<div class="pillars" id="features">
+  <div class="pillar-block">
+    <svg class="pillar-icon" viewBox="0 0 40 40" fill="none">
+      <rect x="4" y="4" width="32" height="32" rx="2" stroke="rgba(0,163,224,0.6)" stroke-width="1.5"/>
+      <path d="M12 20 L20 12 L28 20 L20 28 Z" fill="rgba(0,163,224,0.25)" stroke="rgba(0,163,224,0.8)" stroke-width="1.2"/>
+    </svg>
+    <p class="pillar-title">Rendering</p>
+    <p class="pillar-text">Physically-based rendering with real-time global illumination, volumetric lighting, and cinematic weather systems. Every scene rendered with full atmospheric fidelity.</p>
+    <span class="pillar-tag">PBR · GI · Volumetrics</span>
+  </div>
+  <div class="pillar-block">
+    <svg class="pillar-icon" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="14" stroke="rgba(0,163,224,0.6)" stroke-width="1.5"/>
+      <circle cx="20" cy="20" r="6" fill="rgba(0,163,224,0.2)" stroke="rgba(0,163,224,0.7)" stroke-width="1.2"/>
+      <path d="M20 6 L20 14 M20 26 L20 34 M6 20 L14 20 M26 20 L34 20" stroke="rgba(0,163,224,0.4)" stroke-width="1"/>
+    </svg>
+    <p class="pillar-title">Simulation</p>
+    <p class="pillar-text">Physics-driven vehicle simulation, ballistic systems, and environmental interaction. Every element responds to the world with realistic, emergent behaviour.</p>
+    <span class="pillar-tag">Physics · Ballistics · AI</span>
+  </div>
+  <div class="pillar-block">
+    <svg class="pillar-icon" viewBox="0 0 40 40" fill="none">
+      <path d="M8 28 L20 8 L32 28 Z" stroke="rgba(0,163,224,0.6)" stroke-width="1.5" fill="rgba(0,163,224,0.1)"/>
+      <path d="M14 22 L20 12 L26 22 Z" stroke="rgba(0,163,224,0.5)" stroke-width="1" fill="rgba(0,163,224,0.15)"/>
+    </svg>
+    <p class="pillar-title">Modding Tools</p>
+    <p class="pillar-text">A fully open scripting API, Workbench editor, and Workshop integration. Everything used to build Arma Reforger is available to the community.</p>
+    <span class="pillar-tag">Workbench · EnScript · Workshop</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TECH DETAILS
+════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Technical Capabilities</h2>
+    <span class="section-subtitle">Architecture designed for scale</span>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-item">
+      <div class="tech-item-num">01</div>
+      <div>
+        <p class="tech-item-title">Large World Scale</p>
+        <p class="tech-item-text">Supports terrain maps exceeding 100 km² with streaming geometry, LOD systems, and background world simulation — designed for the scale Arma demands.</p>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-item-num">02</div>
+      <div>
+        <p class="tech-item-title">Cross-Platform Architecture</p>
+        <p class="tech-item-text">Native builds for PC, Xbox Series X|S, and PlayStation 5. Shared codebase with platform-specific performance optimisation layers for each target.</p>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-item-num">03</div>
+      <div>
+        <p class="tech-item-title">EnScript Scripting API</p>
+        <p class="tech-item-text">A full-featured, type-safe scripting language modders use to create everything from new weapons to entirely new game modes. Identical to what BI devs use internally.</p>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-item-num">04</div>
+      <div>
+        <p class="tech-item-title">Networked Simulation</p>
+        <p class="tech-item-text">Server-authoritative multiplayer with client-side prediction and a custom replication layer supporting 128+ simultaneous players in a shared physics simulation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     GAMES
+════════════════════════════════════════ -->
+<section class="section" id="games" style="padding-top: 0;">
+  <div class="section-header">
+    <h2 class="section-title">Games Built on Enfusion</h2>
+    <a href="index.html" class="section-subtitle" style="color:var(--ef-blue);text-decoration:none;font-size:13px;font-weight:600;">All games →</a>
+  </div>
+  <div class="games-grid">
+    <a href="arma.html" class="game-card">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg" alt="Arma Reforger" loading="lazy">
+      <div class="game-card-overlay"></div>
+      <div class="game-card-content">
+        <p class="game-card-tag">Military Simulation · PC, Xbox, PlayStation</p>
+        <h3 class="game-card-name">Arma Reforger</h3>
+      </div>
+    </a>
+    <a href="#" class="game-card" style="cursor:default;">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/1874880/library_hero.jpg" alt="Arma 4" loading="lazy" style="filter: brightness(0.3) saturate(0) hue-rotate(180deg);">
+      <div class="game-card-overlay" style="background: linear-gradient(to top, rgba(4,6,8,0.95) 0%, rgba(4,6,8,0.4) 100%);"></div>
+      <div class="game-card-content">
+        <p class="game-card-tag" style="color:rgba(0,163,224,0.6);">Coming — In Development</p>
+        <h3 class="game-card-name" style="color:rgba(255,255,255,0.4);">Arma 4</h3>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CTA
+════════════════════════════════════════ -->
+<div class="cta-block">
+  <div>
+    <h2>Start Building<br>on <span>Enfusion</span></h2>
+    <p>Whether you're creating mods for Arma Reforger or building your next project on Enfusion — the full documentation, tools, and community are available now.</p>
+    <div class="cta-actions">
+      <a href="#" class="btn-ef-primary">Documentation</a>
+      <a href="#" class="btn-ef-outline">Workbench Download</a>
+    </div>
+  </div>
+  <div style="display:grid;gap:16px;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);padding:24px 28px;">
+      <p style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ef-blue);margin-bottom:8px;">Community Discord</p>
+      <p style="font-size:13px;color:var(--text-dim);line-height:1.6;">Connect with thousands of Enfusion modders, get help, share your work, and follow engine development.</p>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);padding:24px 28px;">
+      <p style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ef-blue);margin-bottom:8px;">Workshop</p>
+      <p style="font-size:13px;color:var(--text-dim);line-height:1.6;">Browse, download, and publish mods for Arma Reforger directly through the Workshop platform.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">
+    <div class="bi-name">Bohemia Interactive</div>
+    <div class="game-name">ENFUSION</div>
+    <p>Proprietary game engine. Powering Arma Reforger and the future of Bohemia Interactive games.</p>
+  </div>
+  <div class="footer-links">
+    <div class="footer-col">
+      <h4>Engine</h4>
+      <a href="#">Overview</a><a href="#">Features</a><a href="#">Changelog</a><a href="#">Roadmap</a>
+    </div>
+    <div class="footer-col">
+      <h4>Developers</h4>
+      <a href="#">Documentation</a><a href="#">EnScript API</a><a href="#">Workbench</a><a href="#">GitHub</a>
+    </div>
+    <div class="footer-col">
+      <h4>Games</h4>
+      <a href="arma.html">Arma Reforger</a><a href="#">Arma 4 (TBA)</a><a href="index.html">All Games</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="https://careers.bohemia.net" target="_blank">Careers</a><a href="#">About BI</a><a href="#">Incubator</a>
+    </div>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2026 Bohemia Interactive a.s. — <a href="index.html">bohemia.net</a></span>
+  <div><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+</div>
+
+<script>
+  function toggleHub(btn) {
+    const dropdown = document.getElementById('hub-dropdown');
+    const isOpen = dropdown.classList.contains('open');
+    dropdown.classList.toggle('open');
+    btn.setAttribute('aria-expanded', !isOpen);
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('hub-btn').contains(e.target)) {
+      document.getElementById('hub-dropdown').classList.remove('open');
+      document.getElementById('hub-btn').setAttribute('aria-expanded', 'false');
+    }
+  });
+  window.addEventListener('scroll', function() {
+    document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 30);
+  }, { passive: true });
+</script>
+</body>
+</html>
