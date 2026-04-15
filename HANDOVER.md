@@ -68,12 +68,15 @@ This repo has been through multiple "clean slate" incidents where all files were
    ```
 4. **Branch protection** should be set up on the repo to prevent accidental force pushes to master
 
-### Current State
+### Current State (2026-04-15)
 
-As of the last session, the GitHub remote (`origin`) was removed from the local repo to stop syncing during cleanup. It needs to be re-added before pushing:
+**Local:** 2 commits on `master`, correct user (`culakmar-bistudio`) on both.
+
+**Remote:** No remote configured. Needs to be re-added before pushing:
 
 ```bash
 git remote add origin https://github.com/culakmar-bistudio/bohemian-presentations.git
+git push -u origin master
 ```
 
-The remote repo is currently empty (was deleted and recreated clean). The next push will be the initial commit with the new structure.
+**Next up:** Iterate on `website-strategy/presentation.html` content, then sync template docs in `template/` to match any structural/style changes discovered during that iteration.
